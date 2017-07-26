@@ -1,0 +1,3 @@
+= redmine_hire
+
+Description goes here
