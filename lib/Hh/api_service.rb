@@ -9,7 +9,6 @@ module Hh
     USER_AGENT = 'Redmine/redmine_hire_plugin'
     BASE_URL = 'https://api.hh.ru'
 
-
     def initialize
     end
 
