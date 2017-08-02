@@ -22,7 +22,8 @@ module Hh
           next if hh_response_present?(response['id'])
           hh_response = Hh::Response.create!(hh_id: response['id'])
           hh_applicant = Hh::Applicant.find_or_create_by!(email: response['resume']['email']) # нужно получить email
-          hh_applicant.create_new_task_or_comment(comment_params(vacancy, response['resume']))
+          resume = api_get(response['resume']['url'])
+          hh_applicant.create_new_task_or_comment(comment_params(vacancy, resume))
         end
 
       end
@@ -55,7 +56,21 @@ module Hh
     end
 
     def comment_params(vacancy, resume)
-
+      {
+        vacancy_title:
+        applicant_city: resume['area']['name'],
+        vacancy_city:
+        vacancy_link:
+        applicant_first_name: resume['first_name'],
+        applicant_last_name: resume['last_name'],
+        applicant_middle_name: resume['middle_name'],
+        applicant_birth_date: resume['birth_date'],
+        resume_link:
+        applicant_photo: resume['photo']['medium'],
+        salary: resume['salary'],
+        experience:
+        cover_letter:
+      }
     end
 
     def api_get(url)
