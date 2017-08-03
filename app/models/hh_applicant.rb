@@ -1,3 +1,3 @@
-class HhApplicant < ActiveRecord::Base
-  unloadable
-end
+#class HhApplicant < ActiveRecord::Base
+#  unloadable
+#end

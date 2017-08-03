@@ -19,11 +19,11 @@ module Hh
         vacancy_responses = get_vacancy_responses(vacancy['id'])
 
         vacancy_responses.each do |response|
-          next if hh_response_present?(response['id'])
-          hh_response = Hh::Response.create!(hh_id: response['id'])
-          hh_applicant = Hh::Applicant.find_or_create_by!(email: response['resume']['email']) # нужно получить email
+          next if hh_response_present?(response['id'].to_i)
+          hh_response = HhResponse.create!(hh_id: response['id'])
+          #hh_applicant = HhApplicant.find_or_create_by!(hh_id: response['resume']['id']) # may be we no need this model
           resume = api_get(response['resume']['url'])
-          hh_applicant.create_new_task_or_comment(comment_params(vacancy, resume))
+          IssueBuilder.new(api_data(vacancy, resume), vacancy['id'], response['resume']['id']).execute
         end
 
       end
@@ -35,6 +35,7 @@ module Hh
     def get_active_vacancies
       api_response = api_get("#{BASE_URL}/employers/#{EMPLOYER_ID}/vacancies/active")
       return api_response['items']
+      # dev comment - our vacancy ids
       # ["21823752", "21832250", "21832252", "21886603", "21955892", "21470306", "21996340", "22066538", "21520789", "21530976", "22146965", "22146966"]
     end
 
@@ -55,21 +56,22 @@ module Hh
       Hh::Response.find_by(hh_id: id).present?
     end
 
-    def comment_params(vacancy, resume)
+    def api_data(vacancy, resume)
       {
-        vacancy_title:
+        vacancy_name: vacancy['name'],
         applicant_city: resume['area']['name'],
-        vacancy_city:
-        vacancy_link:
+        vacancy_city: vacancy['area']['name'],
+        vacancy_link: vacancy['alternate_url'],
+        applicant_email: resume['contact'].select { |c| c['type']['id'] == 'email' }.first['value'],
         applicant_first_name: resume['first_name'],
         applicant_last_name: resume['last_name'],
         applicant_middle_name: resume['middle_name'],
         applicant_birth_date: resume['birth_date'],
-        resume_link:
+        resume_link: resume['alternate_url'],
         applicant_photo: resume['photo']['medium'],
         salary: resume['salary'],
-        experience:
-        cover_letter:
+        experience: resume['experience'],
+        #cover_letter:
       }
     end
 
