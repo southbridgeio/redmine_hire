@@ -29,7 +29,6 @@ module Hh
 
           IssueBuilder.new(api_data(vacancy, resume)).execute
         end
-
       end
     end
 

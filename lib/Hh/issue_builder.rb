@@ -1,7 +1,7 @@
 module Hh
   class IssueBuilder
 
-    PROJECT_NAME = 'Работа'
+    PROJECT_NAME = Setting.plugin_redmine_hire['project_name']
 
     def initialize(api_data)
       @api_data = api_data
@@ -37,11 +37,24 @@ module Hh
     end
 
     def previous_works(works)
-      # add logic
+      works.map do |work|
+        "период: #{work['start']} - #{work['end']} (#{exp_in_monthes(work['start'], work['end'])}),
+         город: #{work['area']['name']}, компания: #{work['company']},
+         опыт: #{work['description']}.
+        "
+      end.join("\n")
     end
 
+    период (+длительность), Город, название компании, описание опыта.
+
     def previous_issues
-      # Issue.where(resume_id: @resume_id)
+      Issue.where(resume_id: @resume_id).map do |issue|
+        Rails.application.routes.url_helpers.issue_path(issue)
+      end.join(' ')
+    end
+
+    def exp_in_monthes(start, finish)
+      (finish.to_date - start.to_date).to_i/30
     end
 
   end
