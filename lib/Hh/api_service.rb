@@ -16,20 +16,38 @@ module Hh
       byebug
       vacancies = get_active_vacancies
       vacancies.each do |vacancy|
+        vacancy_save(vacancy)
+
         vacancy_responses = get_vacancy_responses(vacancy['id'])
 
-        vacancy_responses.each do |response|
-          next if hh_response_present?(response['id'].to_i)
-          hh_response = HhResponse.create!(hh_id: response['id'])
-          #hh_applicant = HhApplicant.find_or_create_by!(hh_id: response['resume']['id']) # may be we no need this model
-          resume = api_get(response['resume']['url'])
-          IssueBuilder.new(api_data(vacancy, resume), vacancy['id'], response['resume']['id']).execute
+        vacancy_responses.each do |hh_response|
+          next if hh_response_present?(hh_response['id'].to_i)
+          hh_response_save(hh_response)
+
+          resume = api_get(hh_response['resume']['url'])
+          applicant_save(resume)
+
+          IssueBuilder.new(api_data(vacancy, resume)).execute
         end
 
       end
     end
 
     private
+
+    def vacancy_save(vacancy)
+      vacancy = HhVacancy.find_or_create_by!(hh_id: vacancy['id'])
+      vacancy.update!(info: vacancy, info_updated_at: DateTime.current)
+    end
+
+    def hh_response_save(hh_response)
+      HhResponse.create!(hh_id: hh_response['id'])
+    end
+
+    def applicant_save(resume)
+      hh_applicant = HhApplicant.find_or_create_by!(hh_id: resume['id'])
+      hh_applicant.update!(resume: resume, resume_updated_at: DateTime.current)
+    end
 
     # GET /employers/{employer_id}/vacancies/active // получаем все активные вакансии
     def get_active_vacancies
@@ -39,7 +57,7 @@ module Hh
       # ["21823752", "21832250", "21832252", "21886603", "21955892", "21470306", "21996340", "22066538", "21520789", "21530976", "22146965", "22146966"]
     end
 
-    # GET /negotiations?vacancy_id={vacancy_id}
+    # GET /negotiations?vacancy_id={vacancy_id} // получить все коллекции откликов
     #def get_response_collections(vacancies_ids)
     #  vacancies_ids.each do |vacancy_id|
     #    # do request, get response
@@ -58,6 +76,8 @@ module Hh
 
     def api_data(vacancy, resume)
       {
+        vacancy_id: vacancy['id'],
+        resume_id: resume['id'],
         vacancy_name: vacancy['name'],
         applicant_city: resume['area']['name'],
         vacancy_city: vacancy['area']['name'],

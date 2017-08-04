@@ -3,15 +3,13 @@ module Hh
 
     PROJECT_NAME = 'Работа'
 
-    def initialize(api_data, vacancy_id, resume_id)
+    def initialize(api_data)
       @api_data = api_data
-      @vacancy_id = vacancy_id
-      @resume_id = resume_id
     end
 
     def execute
       project = Project.find_by(name: PROJECT_NAME)
-      issue = project.issues.find_or_create_by!(vacancy_id: @vacancy_id, resume_id: @resume_id) do |issue|
+      issue = project.issues.find_or_create_by!(vacancy_id: @api_data[:vacancy_id], resume_id: @api_data[:resume_id]) do |issue|
         issue.subject = build_subject(@api_data)
       end
       issue.journals.create!(notes: build_comment(@api_data))
