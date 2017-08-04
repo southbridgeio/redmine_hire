@@ -8,8 +8,10 @@ end
 Redmine::Plugin.register :redmine_hire do
   name 'Redmine Hire plugin'
   author 'Southbridge'
-  description 'This is a plugin for Redmine'
+  description 'Plugin to work with the hire responses'
   version '0.0.1'
   url 'http://example.com/path/to/plugin'
   author_url 'https://github.com/centosadmin'
+
+  settings :default => {'hh_access_token' => '', 'hh_employer_id' => ''}, :partial => 'settings/redmine_hire_settings'
 end

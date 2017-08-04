@@ -4,8 +4,8 @@ require "uri"
 module Hh
   class ApiService
 
-    ACCESS_TOKEN = 'OH8I8E971RUO873RODIF7K62RPQHTPVMRJTJFITB3IH280UCHARB42ALSJV5US6Q'
-    EMPLOYER_ID = '1193714'
+    ACCESS_TOKEN = Setting.plugin_redmine_hire['hh_access_token']
+    EMPLOYER_ID =  Setting.plugin_redmine_hire['hh_employer_id']
     USER_AGENT = 'Redmine/redmine_hire_plugin'
     BASE_URL = 'https://api.hh.ru'
 
@@ -13,7 +13,7 @@ module Hh
     end
 
     def execute
-      byebug
+      #byebug
       vacancies = get_active_vacancies
       vacancies.each do |vacancy|
         vacancy_save(vacancy)
