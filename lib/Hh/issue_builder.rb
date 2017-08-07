@@ -3,21 +3,23 @@ module Hh
 
     PROJECT_NAME = Setting.plugin_redmine_hire['project_name']
 
+    attr_reader :api_data
+
     def initialize(api_data)
       @api_data = api_data
     end
 
     def execute
       project = Project.find_by(name: PROJECT_NAME)
-      issue = project.issues.find_or_create_by!(vacancy_id: @api_data[:vacancy_id], resume_id: @api_data[:resume_id]) do |issue|
-        issue.subject = build_subject(@api_data)
+      issue = project.issues.find_or_create_by!(vacancy_id: api_data[:vacancy_id], resume_id: api_data[:resume_id]) do |issue|
+        issue.subject = build_subject
       end
-      issue.journals.create!(notes: build_comment(@api_data))
+      issue.journals.create!(notes: build_comment)
     end
 
     private
 
-    def build_comment(api_data)
+    def build_comment
       "Вакансия: #{api_data[:vacancy_city]}, #{api_data[:vacancy_link]}.
        ФИО: #{api_data[:last_name]} #{api_data[:first_name]} #{api_data[:middle_name]}.
        Город: #{api_data[:applicant_city]}. Дата рождения: #{api_data[:applicant_birth_date]}.
@@ -32,7 +34,7 @@ module Hh
       "
     end
 
-    def build_subject(api_data)
+    def build_subject
       "#{api_data[:vacancy_title]} (#{api_data[:applicant_city]})"
     end
 
@@ -45,10 +47,8 @@ module Hh
       end.join("\n")
     end
 
-    период (+длительность), Город, название компании, описание опыта.
-
     def previous_issues
-      Issue.where(resume_id: @resume_id).map do |issue|
+      Issue.where(resume_id: api_data[:resume_id]).map do |issue|
         Rails.application.routes.url_helpers.issue_path(issue)
       end.join(' ')
     end
