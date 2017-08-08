@@ -32,6 +32,13 @@ module Hh
       end
     end
 
+    def clear_db! # only for debug
+      Project.find_by(name: 'Работа').issues.destroy_all
+      HhResponse.destroy_all
+      HhApplicant.destroy_all
+      HhVacancy.destroy_all
+    end
+
     private
 
     def vacancy_save(vacancy)
@@ -52,8 +59,6 @@ module Hh
     def get_active_vacancies
       api_response = api_get("#{BASE_URL}/employers/#{EMPLOYER_ID}/vacancies/active")
       return api_response['items']
-      # dev comment - our vacancy ids
-      # ["21823752", "21832250", "21832252", "21886603", "21955892", "21470306", "21996340", "22066538", "21520789", "21530976", "22146965", "22146966"]
     end
 
     # GET /negotiations?vacancy_id={vacancy_id} // получить все коллекции откликов
@@ -70,7 +75,7 @@ module Hh
     end
 
     def hh_response_present?(id)
-      Hh::Response.find_by(hh_id: id).present?
+      HhResponse.find_by(hh_id: id).present?
     end
 
     def api_data(vacancy, resume)
@@ -87,8 +92,8 @@ module Hh
         applicant_middle_name: resume['middle_name'],
         applicant_birth_date: resume['birth_date'],
         resume_link: resume['alternate_url'],
-        applicant_photo: resume['photo']['medium'],
-        salary: resume['salary'],
+        applicant_photo: (resume['photo']['medium'] if resume['photo'].present?),
+        salary: (resume['salary']['amount'] if resume['salary'].present?),
         experience: resume['experience'],
         #cover_letter:
       }
