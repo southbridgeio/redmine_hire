@@ -13,5 +13,12 @@ Redmine::Plugin.register :redmine_hire do
   url 'http://example.com/path/to/plugin'
   author_url 'https://github.com/centosadmin'
 
-  settings :default => {'hh_access_token' => '', 'hh_employer_id' => '', 'project_name' => 'Работа'}, :partial => 'settings/redmine_hire_settings'
+  settings :default => {
+    'hh_access_token' => '',
+    'hh_employer_id' => '',
+    'project_name' => '',
+    'issue_status' => '',
+    'issue_tracker' => '',
+    'issue_autor' => ''
+  }, :partial => 'settings/redmine_hire_settings'
 end

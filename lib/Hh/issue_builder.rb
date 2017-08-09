@@ -1,7 +1,10 @@
 module Hh
   class IssueBuilder
 
-    PROJECT_NAME = Setting.plugin_redmine_hire['project_name'] || 'Работа'
+    PROJECT_NAME = Setting.plugin_redmine_hire['project_name']
+    ISSUE_STATUS = Setting.plugin_redmine_hire['issue_status']
+    ISSUE_TRACKER = Setting.plugin_redmine_hire['issue_tracker']
+    ISSUE_AUTOR = Setting.plugin_redmine_hire['issue_autor']
 
     attr_reader :api_data
 
@@ -13,9 +16,9 @@ module Hh
       project = Project.find_or_create_by!(name: PROJECT_NAME)
       issue = project.issues.find_or_create_by!(vacancy_id: api_data[:vacancy_id], resume_id: api_data[:resume_id]) do |issue|
         issue.subject = build_subject
-        issue.status = IssueStatus.find_by(name: 'Новая') # need to clarify
-        issue.tracker = Tracker.find_by(name: 'Поддержка') # need to clarify
-        issue.author = User.last # need to clarify
+        issue.status = IssueStatus.find_by(name: ISSUE_STATUS)
+        issue.tracker = Tracker.find_by(name: ISSUE_TRACKER)
+        issue.author = User.find_by(login: ISSUE_AUTOR)
       end
       issue.journals.create!(notes: build_comment)
     end

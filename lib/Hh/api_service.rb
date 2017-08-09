@@ -16,18 +16,24 @@ module Hh
       #byebug
       vacancies = get_active_vacancies
       vacancies.each do |vacancy|
-        vacancy_save(vacancy)
+        begin
+          vacancy_save(vacancy)
 
-        vacancy_responses = get_vacancy_responses(vacancy['id'])
+          vacancy_responses = get_vacancy_responses(vacancy['id'])
 
-        vacancy_responses.each do |hh_response|
-          next if hh_response_present?(hh_response['id'].to_i)
-          hh_response_save(hh_response)
+          vacancy_responses.each do |hh_response|
+            next if hh_response_present?(hh_response['id'].to_i)
+            hh_response_save(hh_response)
 
-          resume = api_get(hh_response['resume']['url'])
-          applicant_save(resume)
+            resume = api_get(hh_response['resume']['url'])
+            applicant_save(resume)
 
-          IssueBuilder.new(api_data(vacancy, resume)).execute
+            IssueBuilder.new(api_data(vacancy, resume)).execute
+          end
+        rescue => e
+          logger.error e.to_s
+          logger.error e.backtrace.join("\n")
+          next
         end
       end
     end
@@ -113,6 +119,8 @@ module Hh
       JSON.parse(response.body)
     end
 
-
+    def logger
+      @logger ||= Logger.new(Rails.root.join('log', 'redmine_hire.log'))
+    end
   end
 end
