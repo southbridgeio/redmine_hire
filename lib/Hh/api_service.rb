@@ -13,7 +13,6 @@ module Hh
     end
 
     def execute
-      #byebug
       vacancies = get_active_vacancies
       vacancies.each do |vacancy|
         begin
@@ -38,8 +37,8 @@ module Hh
       end
     end
 
-    def clear_db! # only for debug
-      Project.find_by(name: 'Работа').issues.destroy_all
+    def rollback! # only for debug
+      Project.find_by(name: 'Работа').issues.where.not(resume_id: nil).destroy_all
       HhResponse.destroy_all
       HhApplicant.destroy_all
       HhVacancy.destroy_all
