@@ -100,6 +100,7 @@ module Hh
         applicant_photo: (resume['photo']['medium'] if resume['photo'].present?),
         salary: (resume['salary']['amount'] if resume['salary'].present?),
         experience: resume['experience'],
+        description: resume['skills'],
         #cover_letter:
       }
     end

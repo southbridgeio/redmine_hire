@@ -36,6 +36,8 @@ module Hh
         Зарплата: #{api_data[:salary] || 'не указана'}
         Email: #{api_data[:applicant_email]}
 
+        Описание: #{api_data[:description]}
+
         Предыдущие места работы:
         #{previous_works(api_data[:experience])}
 
@@ -64,7 +66,7 @@ module Hh
     def previous_issues(current_issue)
       previous_issues_ids = Issue.where(resume_id: api_data[:resume_id]).pluck(:id) - [current_issue.id]
       previous_issues_ids.map do |issue_id|
-        Addressable::URI.parse("#{Setting['protocol']}://#{Setting['host_name']}/issues/#{issue_id}").to_s
+        "##{issue_id}"
       end.join(' ')
     end
 
