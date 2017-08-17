@@ -14,7 +14,7 @@ module Hh
 
     def execute
       vacancies = get_active_vacancies
-      vacancies.take(5).each do |vacancy|
+      vacancies.each do |vacancy|
         begin
           vacancy_save(vacancy)
 
