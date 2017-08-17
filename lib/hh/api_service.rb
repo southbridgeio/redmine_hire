@@ -14,7 +14,7 @@ module Hh
 
     def execute
       vacancies = get_active_vacancies
-      vacancies.each do |vacancy|
+      vacancies.take(5).each do |vacancy|
         begin
           vacancy_save(vacancy)
 
@@ -27,7 +27,9 @@ module Hh
             resume = api_get(hh_response['resume']['url'])
             applicant_save(resume)
 
-            IssueBuilder.new(api_data(vacancy, resume)).execute
+            cover_letter = get_cover_letter(hh_response['messages_url'])
+
+            IssueBuilder.new(api_data(vacancy, resume, cover_letter)).execute
           end
         rescue => e
           logger.error e.to_s
@@ -79,11 +81,16 @@ module Hh
       return api_response['items']
     end
 
+    def get_cover_letter(messages_url)
+      api_response = api_get(messages_url)
+      return api_response['items'].first['text']
+    end
+
     def hh_response_present?(id)
       HhResponse.find_by(hh_id: id).present?
     end
 
-    def api_data(vacancy, resume)
+    def api_data(vacancy, resume, cover_letter)
       {
         vacancy_id: vacancy['id'],
         resume_id: resume['id'],
@@ -101,7 +108,7 @@ module Hh
         salary: (resume['salary']['amount'] if resume['salary'].present?),
         experience: resume['experience'],
         description: resume['skills'],
-        #cover_letter:
+        cover_letter: cover_letter
       }
     end
 
