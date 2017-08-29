@@ -68,6 +68,12 @@ module Hh
       return api_response['items']
     end
 
+    # GET /employers/{employer_id}/vacancies/???? // получаем все закрытые вакансии
+    def get_close_vacancies
+      api_response = api_get("#{BASE_URL}/employers/#{EMPLOYER_ID}/vacancies/????")
+      return api_response['items']
+    end
+
     # GET /negotiations?vacancy_id={vacancy_id} // получить все коллекции откликов
     #def get_response_collections(vacancies_ids)
     #  vacancies_ids.each do |vacancy_id|

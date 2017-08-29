@@ -8,6 +8,7 @@ module Hh
     ISSUE_STATUS = Setting.plugin_redmine_hire['issue_status']
     ISSUE_TRACKER = Setting.plugin_redmine_hire['issue_tracker']
     ISSUE_AUTOR = Setting.plugin_redmine_hire['issue_autor']
+    REDMINE_API_KEY = Setting.plugin_redmine_hire['redmine_api_key']
 
     attr_reader :api_data
 
@@ -17,15 +18,19 @@ module Hh
 
     def execute
       return if Issue.where(vacancy_id: api_data[:vacancy_id], resume_id: api_data[:resume_id]).present?
-      #byebug
       uri = URI.parse "#{Setting['protocol']}://#{Setting['host_name']}/helpdesk/create_ticket.xml"
       request = Net::HTTP::Post.new uri.path
       request.content_type = 'application/xml'
-      request['X-Redmine-API-Key'] = 'd62516e043709681bfb22918b600171879221172'
+      request['X-Redmine-API-Key'] = REDMINE_API_KEY
       request.body = build_xml
 
       http = Net::HTTP.new(uri.host, uri.port)
       response = http.request(request)
+
+      new_issue_id = response.body.gsub(/[^\d]/, '')
+      Issue.find(new_issue_id).update!(vacancy_id: api_data[:vacancy_id], resume_id: api_data[:resume_id])
+
+      # create issues without Helpdesk API
 
       #project = Project.find_or_create_by!(name: PROJECT_NAME)
       #issue = project.issues.find_or_create_by!(vacancy_id: api_data[:vacancy_id], resume_id: api_data[:resume_id]) do |i|
@@ -114,11 +119,3 @@ module Hh
 
   end
 end
-
-#contact = Contact.find_or_create_by!(email: resume_email) do |contact|
-#  contact.first_name =
-#  contact.last_name =
-#  contact.project = Project.find_by(name: PROJECT_NAME)
-#end
-#
-#HelpdeskTicket.create(customer: contact, issue: issue)
