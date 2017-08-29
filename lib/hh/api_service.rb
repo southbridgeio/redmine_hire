@@ -1,5 +1,5 @@
 require 'net/http'
-require "uri"
+require 'uri'
 
 module Hh
   class ApiService
@@ -65,6 +65,12 @@ module Hh
     # GET /employers/{employer_id}/vacancies/active // получаем все активные вакансии
     def get_active_vacancies
       api_response = api_get("#{BASE_URL}/employers/#{EMPLOYER_ID}/vacancies/active")
+      return api_response['items']
+    end
+
+    # GET /employers/{employer_id}/vacancies/???? // получаем все закрытые вакансии
+    def get_close_vacancies
+      api_response = api_get("#{BASE_URL}/employers/#{EMPLOYER_ID}/vacancies/????")
       return api_response['items']
     end
 

@@ -1,3 +1,6 @@
+require 'net/http'
+require 'uri'
+
 module Hh
   class IssueBuilder
 
@@ -5,6 +8,7 @@ module Hh
     ISSUE_STATUS = Setting.plugin_redmine_hire['issue_status']
     ISSUE_TRACKER = Setting.plugin_redmine_hire['issue_tracker']
     ISSUE_AUTOR = Setting.plugin_redmine_hire['issue_autor']
+    REDMINE_API_KEY = Setting.plugin_redmine_hire['redmine_api_key']
 
     attr_reader :api_data
 
@@ -13,17 +17,52 @@ module Hh
     end
 
     def execute
-      project = Project.find_or_create_by!(name: PROJECT_NAME)
-      issue = project.issues.find_or_create_by!(vacancy_id: api_data[:vacancy_id], resume_id: api_data[:resume_id]) do |i|
-        i.subject = build_subject
-        i.status = IssueStatus.find_by(name: ISSUE_STATUS)
-        i.tracker = Tracker.find_by(name: ISSUE_TRACKER)
-        i.author = User.find_by(login: ISSUE_AUTOR)
-        i.description = build_comment
-      end
+      return if Issue.where(vacancy_id: api_data[:vacancy_id], resume_id: api_data[:resume_id]).present?
+      uri = URI.parse "#{Setting['protocol']}://#{Setting['host_name']}/helpdesk/create_ticket.xml"
+      request = Net::HTTP::Post.new uri.path
+      request.content_type = 'application/xml'
+      request['X-Redmine-API-Key'] = REDMINE_API_KEY
+      request.body = build_xml
+
+      http = Net::HTTP.new(uri.host, uri.port)
+      response = http.request(request)
+
+      new_issue_id = response.body.gsub(/[^\d]/, '')
+      Issue.find(new_issue_id).update!(vacancy_id: api_data[:vacancy_id], resume_id: api_data[:resume_id])
+
+      # create issues without Helpdesk API
+
+      #project = Project.find_or_create_by!(name: PROJECT_NAME)
+      #issue = project.issues.find_or_create_by!(vacancy_id: api_data[:vacancy_id], resume_id: api_data[:resume_id]) do |i|
+      #  i.subject = build_subject
+      #  i.status = IssueStatus.find_by(name: ISSUE_STATUS)
+      #  i.tracker = Tracker.find_by(name: ISSUE_TRACKER)
+      #  i.author = User.find_by(login: ISSUE_AUTOR)
+      #  i.description = build_comment
+      #end
     end
 
     private
+
+    def build_xml
+      xm = Builder::XmlMarkup.new
+      xm.instruct!
+      xm.ticket {
+        xm.issue {
+          xm.project_id(Project.find_by(name: PROJECT_NAME).id)
+          xm.subject(build_subject)
+          xm.status_id(IssueStatus.find_by(name: ISSUE_STATUS).id)
+          xm.tracker_id(Tracker.find_by(name: ISSUE_TRACKER).id)
+          xm.author_id(User.find_by(login: ISSUE_AUTOR).id)
+          xm.description(build_comment)
+        }
+        xm.contact {
+          xm.email(api_data[:applicant_email])
+          xm.first_name(api_data[:applicant_first_name])
+          xm.last_name(api_data[:applicant_last_name])
+        }
+      }
+    end
 
     def build_comment
       <<~END
