@@ -71,7 +71,7 @@ module Hh
         *Город:* #{api_data[:applicant_city]}
         *Дата рождения:* #{api_data[:applicant_birth_date]&.to_date&.strftime('%d.%m.%Y')}
         *Резюме:* #{api_data[:resume_link]}
-        *Фото:* #{api_data[:applicant_photo]}
+        *Фото:* #{api_data[:applicant_photo] || 'не указано'}
         *Зарплата:* #{api_data[:salary] || 'не указана'}
         *E-mail:* #{api_data[:applicant_email]}
 
@@ -97,7 +97,7 @@ module Hh
       works.map do |work|
         <<~END
           *Период:* #{work['start'].to_date.strftime('%d.%m.%Y')} - #{work['end']&.to_date&.strftime('%d.%m.%Y') || 'наст. время'} (#{exp_in_monthes(work['start'], work['end'])} мес.)
-          *Город:* #{work['area']['name'] if work['area'].present?}
+          *Город:* #{(work['area']['name'] if work['area'].present?) || 'не указан'}
           *Компания:* #{work['company']}
           *Опыт:*
           #{work['description']}
