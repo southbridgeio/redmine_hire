@@ -21,6 +21,7 @@ module Hh
           vacancy_responses = get_vacancy_responses(vacancy['id'])
 
           vacancy_responses.each do |hh_response|
+            #byebug
             next if hh_response_present?(hh_response['id'].to_i)
             hh_response_save(hh_response)
 
@@ -29,7 +30,7 @@ module Hh
 
             cover_letter = get_cover_letter(hh_response['messages_url'])
 
-            IssueBuilder.new(api_data(vacancy, resume, cover_letter)).execute
+            IssueBuilder.new(api_data(vacancy, resume, cover_letter, hh_response['id'])).execute
           end
         rescue => e
           logger.error e.to_s
@@ -54,7 +55,10 @@ module Hh
     end
 
     def hh_response_save(hh_response)
-      HhResponse.create!(hh_id: hh_response['id'])
+      refusal_url = hh_response['actions']
+        .find { |e| e['name'] == 'Отказ' }['templates']
+        .find { |e| e['name'] == "Шаблон быстрого отказа на отклик" }['url']
+      HhResponse.create!(hh_id: hh_response['id'], refusal_url: refusal_url)
     end
 
     def applicant_save(resume)
@@ -89,10 +93,11 @@ module Hh
       HhResponse.find_by(hh_id: id).present?
     end
 
-    def api_data(vacancy, resume, cover_letter)
+    def api_data(vacancy, resume, cover_letter, hh_response_id)
       {
         vacancy_id: vacancy['id'],
         resume_id: resume['id'],
+        hh_response_id: hh_response_id,
         vacancy_name: vacancy['name'],
         applicant_city: resume['area']['name'],
         vacancy_city: vacancy['area']['name'],

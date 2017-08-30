@@ -28,7 +28,11 @@ module Hh
       response = http.request(request)
 
       new_issue_id = response.body.gsub(/[^\d]/, '')
-      Issue.find(new_issue_id).update!(vacancy_id: api_data[:vacancy_id], resume_id: api_data[:resume_id])
+      Issue.find(new_issue_id).update!(
+        vacancy_id: api_data[:vacancy_id],
+        resume_id: api_data[:resume_id],
+        hh_response_id: api_data[:hh_response_id]
+      )
 
       # create issues without Helpdesk API
 
