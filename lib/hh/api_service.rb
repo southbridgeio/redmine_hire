@@ -12,8 +12,8 @@ module Hh
     def initialize
     end
 
-    def execute
-      vacancies = get_active_vacancies
+    def execute(vacancies_status)
+      vacancies = send("get_#{vacancies_status}_vacancies")
       vacancies.each do |vacancy|
         begin
           vacancy_save(vacancy)
@@ -39,8 +39,8 @@ module Hh
       end
     end
 
-    def rollback! # only for debug
-      Project.find_by(name: 'Работа').issues.where.not(resume_id: nil).destroy_all
+    def rollback! # for debug process
+      Project.find_by(name: Hh::IssueBuilder::PROJECT_NAME).issues.where.not(resume_id: nil).destroy_all
       HhResponse.destroy_all
       HhApplicant.destroy_all
       HhVacancy.destroy_all
@@ -68,18 +68,11 @@ module Hh
       return api_response['items']
     end
 
-    # GET /employers/{employer_id}/vacancies/???? // получаем все закрытые вакансии
-    def get_close_vacancies
-      api_response = api_get("#{BASE_URL}/employers/#{EMPLOYER_ID}/vacancies/????")
+    # GET /employers/{employer_id}/vacancies/archived // получаем все архивные вакансии
+    def get_archived_vacancies
+      api_response = api_get("#{BASE_URL}/employers/#{EMPLOYER_ID}/vacancies/archived")
       return api_response['items']
     end
-
-    # GET /negotiations?vacancy_id={vacancy_id} // получить все коллекции откликов
-    #def get_response_collections(vacancies_ids)
-    #  vacancies_ids.each do |vacancy_id|
-    #    # do request, get response
-    #  end
-    #end
 
     # GET /negotiations/response?vacancy_id={vacancy_id} // получаем отклики из коллекции 'response'
     def get_vacancy_responses(vacancy_id)
@@ -135,5 +128,16 @@ module Hh
     def logger
       @logger ||= Logger.new(Rails.root.join('log', 'redmine_hire.log'))
     end
+
+    # Пока не используем коллекции откликов, т.к. все наши отклики в колекции 'response'.
+    # Если будут отклики в других коллекциях, нужно будет последовательно забирать данные
+    # со всех коллекций
+    #
+    # GET /negotiations?vacancy_id={vacancy_id} // получить все коллекции откликов
+    # def get_response_collections(vacancies_ids)
+    #   vacancies_ids.each do |vacancy_id|
+    #     # do request, get response
+    #   end
+    # end
   end
 end
