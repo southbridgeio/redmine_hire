@@ -47,6 +47,10 @@ module Hh
       HhVacancy.destroy_all
     end
 
+    def send_refusal
+      byebug
+    end
+
     private
 
     def vacancy_save(vacancy)
