@@ -47,8 +47,15 @@ module Hh
       HhVacancy.destroy_all
     end
 
-    def send_refusal
+    def send_refusal(issue_id)
       byebug
+      issue = Issue.find(issue_id)
+      hh_response_id = issue.hh_response_id
+      refusal_url = HhResponse.find_by(hh_id: hh_response_id)&.refusal_url
+      response = api_post(refusal_url)
+      if response.code == 200
+        issue.refusal!
+      end
     end
 
     private
@@ -130,6 +137,20 @@ module Hh
         "User-Agent" => USER_AGENT
       }
       request = Net::HTTP::Get.new(uri.request_uri, header)
+      response = http.request(request)
+      JSON.parse(response.body)
+    end
+
+    def api_post(url)
+      uri = URI.parse(url)
+      http = Net::HTTP.new(uri.host, uri.port)
+      http.use_ssl = true
+      header = {
+        "Content-Type" => "application/json",
+        "Authorization" => "Bearer #{ACCESS_TOKEN}",
+        "User-Agent" => USER_AGENT
+      }
+      request = Net::HTTP::Post.new(uri.request_uri, header)
       response = http.request(request)
       JSON.parse(response.body)
     end

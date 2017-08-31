@@ -3,6 +3,7 @@ class AddKeysToIssues < ActiveRecord::Migration
     add_column :issues, :vacancy_id, :bigint
     add_column :issues, :resume_id, :string
     add_column :issues, :hh_response_id, :bigint
+    add_column :issues, :hiring_status, :integer, default: 0
 
     add_index :issues, :vacancy_id
     add_index :issues, :resume_id
@@ -17,5 +18,6 @@ class AddKeysToIssues < ActiveRecord::Migration
     remove_column :issues, :vacancy_id
     remove_column :issues, :resume_id
     remove_column :issues, :hh_response_id
+    remove_column :issues, :hiring_status
   end
 end
