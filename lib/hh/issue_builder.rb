@@ -27,8 +27,15 @@ module Hh
       http = Net::HTTP.new(uri.host, uri.port)
       response = http.request(request)
 
+      raise "Helpdesk API Error" if response.code.start_with?('5')
+
       new_issue_id = response.body.gsub(/[^\d]/, '')
-      Issue.find(new_issue_id).update!(vacancy_id: api_data[:vacancy_id], resume_id: api_data[:resume_id])
+      new_issue_status_id = IssueStatus.find_by(name: ISSUE_STATUS).id
+      Issue.find(new_issue_id).update!(
+        vacancy_id: api_data[:vacancy_id],
+        resume_id: api_data[:resume_id],
+        status_id: new_issue_status_id
+      )
 
       # create issues without Helpdesk API
 
@@ -51,7 +58,6 @@ module Hh
         xm.issue {
           xm.project_id(Project.find_by(name: PROJECT_NAME).id)
           xm.subject(build_subject)
-          xm.status_id(IssueStatus.find_by(name: ISSUE_STATUS).id)
           xm.tracker_id(Tracker.find_by(name: ISSUE_TRACKER).id)
           xm.author_id(User.find_by(login: ISSUE_AUTOR).id)
           xm.description(build_comment)
@@ -115,6 +121,10 @@ module Hh
     def exp_in_monthes(start, finish)
       finish = finish || Date.current
       (finish.to_date - start.to_date).to_i/30
+    end
+
+    def logger
+      @logger ||= Logger.new(Rails.root.join('log', 'redmine_hire.log'))
     end
 
   end
