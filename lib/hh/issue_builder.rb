@@ -25,9 +25,10 @@ module Hh
       request.body = build_xml
 
       http = Net::HTTP.new(uri.host, uri.port)
+      http.use_ssl = true if Setting['protocol'] == "https"
       response = http.request(request)
 
-      raise "Helpdesk API Error" if response.code.start_with?('5')
+      raise "Helpdesk API Error" if (response.code.start_with?('5') || response.code.start_with?('4'))
 
       new_issue_id = response.body.gsub(/[^\d]/, '')
       new_issue_status_id = IssueStatus.find_by(name: ISSUE_STATUS).id
