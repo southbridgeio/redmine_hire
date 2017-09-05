@@ -18,11 +18,15 @@
 <% end %>
 *E-mail:* <%= api_data[:applicant_email] %>
 
-*О себе:*
-<%= api_data[:description] %>
+<% if api_data[:description].present? %>
+  *О себе:*
+  <%= api_data[:description] %>
+<% end %>
 
-*Сопроводительное письмо:*
-<%= api_data[:cover_letter] %>
+<% if api_data[:cover_letter].present? %>
+  *Сопроводительное письмо:*
+  <%= api_data[:cover_letter] %>
+<% end %>
 
 *Предыдущие места работы:*
 <% api_data[:experience].each do |work| %>
