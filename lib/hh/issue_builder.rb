@@ -72,56 +72,24 @@ module Hh
     end
 
     def build_comment
-      <<~END
-        *Вакансия:* #{api_data[:vacancy_link]} (#{api_data[:vacancy_city]})
-        *Имя:* #{api_data[:applicant_first_name]} #{api_data[:applicant_last_name]}
-        *Город:* #{api_data[:applicant_city]}
-        *Дата рождения:* #{api_data[:applicant_birth_date]&.to_date&.strftime('%d.%m.%Y')}
-        *Резюме:* #{api_data[:resume_link]}
-        *Фото:* #{api_data[:applicant_photo] || 'не указано'}
-        *Зарплата:* #{api_data[:salary] || 'не указана'}
-        *E-mail:* #{api_data[:applicant_email]}
+      previous_issues_ids = Issue.where(resume_id: api_data[:resume_id]).pluck(:id)
 
-        *О себе:*
-        #{api_data[:description]}
+      controller = ActionController::Base.new
+      view = ActionView::Base.new('plugins/redmine_hire/app/views', {}, controller)
+      view.class_eval do
+        include RedmineHireHelper
+      end
 
-        *Сопроводительное письмо:*
-        #{api_data[:cover_letter]}
-
-        *Предыдущие места работы:*
-        #{previous_works(api_data[:experience])}
-
-        *Предыдущие отклики:*
-        #{previous_issues}
-      END
+      view.render(
+        template: 'issues/issue_comment',
+        layout: false,
+        content_type: 'text/plain',
+        locals: { api_data: api_data, previous_issues_ids: previous_issues_ids }
+      )
     end
 
     def build_subject
       "#{api_data[:vacancy_name]} #{api_data[:applicant_city].present? ? '('+api_data[:applicant_city]+')' : nil}"
-    end
-
-    def previous_works(works)
-      works.map do |work|
-        <<~END
-          *Период:* #{work['start'].to_date.strftime('%d.%m.%Y')} - #{work['end']&.to_date&.strftime('%d.%m.%Y') || 'наст. время'} (#{exp_in_monthes(work['start'], work['end'])} мес.)
-          *Город:* #{(work['area']['name'] if work['area'].present?) || 'не указан'}
-          *Компания:* #{work['company']}
-          *Опыт:*
-          #{work['description']}
-        END
-      end.join("\n")
-    end
-
-    def previous_issues
-      previous_issues_ids = Issue.where(resume_id: api_data[:resume_id]).pluck(:id)
-      previous_issues_ids.map do |issue_id|
-        "##{issue_id}"
-      end.join(' ')
-    end
-
-    def exp_in_monthes(start, finish)
-      finish = finish || Date.current
-      (finish.to_date - start.to_date).to_i/30
     end
 
     def logger
