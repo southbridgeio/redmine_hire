@@ -32,10 +32,12 @@ module Hh
 
       new_issue_id = response.body.gsub(/[^\d]/, '')
       new_issue_status_id = IssueStatus.find_by(name: ISSUE_STATUS).id
+      new_issue_author_id = User.find_by(login: ISSUE_AUTOR).id
       Issue.find(new_issue_id).update!(
         vacancy_id: api_data[:vacancy_id],
         resume_id: api_data[:resume_id],
-        status_id: new_issue_status_id
+        status_id: new_issue_status_id,
+        author_id: new_issue_author_id
       )
 
       # create issues without Helpdesk API
@@ -60,7 +62,6 @@ module Hh
           xm.project_id(Project.find_by(name: PROJECT_NAME).id)
           xm.subject(build_subject)
           xm.tracker_id(Tracker.find_by(name: ISSUE_TRACKER).id)
-          xm.author_id(User.find_by(login: ISSUE_AUTOR).id)
           xm.description(build_comment)
         }
         xm.contact {
