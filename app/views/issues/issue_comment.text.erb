@@ -1,0 +1,41 @@
+<% if previous_issues_ids.size > 0 %>
+  *Предыдущие отклики:*
+  <% previous_issues_ids.each do |issue_id| %>
+    #<%= issue_id %>
+  <% end %>
+<% end %>
+
+*Вакансия:* <%= api_data[:vacancy_link] %> (<%= api_data[:vacancy_city] %>)
+*Имя:* <%= api_data[:applicant_first_name] %> <%= api_data[:applicant_last_name] %>
+*Город:* <%= api_data[:applicant_city] %>
+*Дата рождения:* <%= api_data[:applicant_birth_date]&.to_date&.strftime('%d.%m.%Y') %>
+*Резюме:* <%= api_data[:resume_link] %>
+<% if api_data[:applicant_photo].present? %>
+  *Фото:* <%= api_data[:applicant_photo] %>
+<% end %>
+<% if api_data[:salary].present? %>
+  *Зарплата:* <%= api_data[:salary] %>
+<% end %>
+*E-mail:* <%= api_data[:applicant_email] %>
+
+<% if api_data[:description].present? %>
+*О себе:*
+<%= api_data[:description] %>
+<% end %>
+
+<% if api_data[:cover_letter].present? %>
+*Сопроводительное письмо:*
+<%= api_data[:cover_letter] %>
+<% end %>
+
+*Предыдущие места работы:*
+<% api_data[:experience].each do |work| %>
+  *Период:* <%= work['start'].to_date.strftime('%d.%m.%Y') %> - <%= work['end']&.to_date&.strftime('%d.%m.%Y') || 'наст. время' %> (<%= exp_in_monthes(work['start'], work['end']) %> мес.)
+  <% if work.dig('area', 'name').present? %>
+    *Город:* <%= work['area']['name'] %>
+  <% end %>
+  *Компания:* <%= work['company'] %>
+  *Опыт:*
+  <%= work['description'] %>
+
+<% end %>

@@ -25,6 +25,8 @@ module Hh
             next if hh_response_present?(hh_response['id'].to_i)
             hh_response_save(hh_response)
 
+            raise "Resume empty" if hh_response['resume'].blank?
+
             resume = api_get(hh_response['resume']['url'])
             applicant_save(resume)
 
@@ -38,6 +40,8 @@ module Hh
           next
         end
       end
+    rescue => e
+      logger.error e.to_s
     end
 
     def rollback! # for debug process
@@ -138,7 +142,12 @@ module Hh
       }
       request = Net::HTTP::Get.new(uri.request_uri, header)
       response = http.request(request)
-      JSON.parse(response.body)
+      response_body = JSON.parse(response.body)
+      if response.code.start_with?('5') || response.code.start_with?('4')
+        errors = response_body['errors'].map { |e| "#{e['type']}: #{e['value']}" }.join(', ')
+        raise "HH API Error: #{errors}"
+      end
+      response_body
     end
 
     def api_post(url)
