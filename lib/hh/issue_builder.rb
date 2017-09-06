@@ -18,26 +18,17 @@ module Hh
 
     def execute
       return if Issue.where(vacancy_id: api_data[:vacancy_id], resume_id: api_data[:resume_id]).present?
-      uri = URI.parse "#{Setting['protocol']}://#{Setting['host_name']}/helpdesk/create_ticket.xml"
-      request = Net::HTTP::Post.new uri.path
-      request.content_type = 'application/xml'
-      request['X-Redmine-API-Key'] = REDMINE_API_KEY
-      request.body = build_xml
-
-      http = Net::HTTP.new(uri.host, uri.port)
-      http.use_ssl = true if Setting['protocol'] == "https"
-      response = http.request(request)
-
+      response = helpdesk_api_post
       raise "Helpdesk API Error" if (response.code.start_with?('5') || response.code.start_with?('4'))
 
       new_issue_id = response.body.gsub(/[^\d]/, '')
-      new_issue_status_id = IssueStatus.find_by(name: ISSUE_STATUS).id
-      new_issue_author_id = User.find_by(login: ISSUE_AUTOR).id
+      new_issue_status_id = IssueStatus.find_by(name: ISSUE_STATUS)&.id
+      new_issue_author = User.find_by(login: ISSUE_AUTOR) || User.find_by(status: User::STATUS_ANONYMOUS)
       Issue.find(new_issue_id).update!(
         vacancy_id: api_data[:vacancy_id],
         resume_id: api_data[:resume_id],
         status_id: new_issue_status_id,
-        author_id: new_issue_author_id,
+        author_id: new_issue_author&.id,
         hh_response_id: api_data[:hh_response_id]
       )
 
@@ -54,6 +45,18 @@ module Hh
     end
 
     private
+
+    def helpdesk_api_post
+      uri = URI.parse "#{Setting['protocol']}://#{Setting['host_name']}/helpdesk/create_ticket.xml"
+      request = Net::HTTP::Post.new uri.path
+      request.content_type = 'application/xml'
+      request['X-Redmine-API-Key'] = REDMINE_API_KEY
+      request.body = build_xml
+
+      http = Net::HTTP.new(uri.host, uri.port)
+      http.use_ssl = true if Setting['protocol'] == "https"
+      response = http.request(request)
+    end
 
     def build_xml
       xm = Builder::XmlMarkup.new
