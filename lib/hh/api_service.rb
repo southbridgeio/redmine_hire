@@ -56,9 +56,12 @@ module Hh
       issue = Issue.find(issue_id)
       hh_response_id = issue.hh_response_id
       refusal_url = HhResponse.find_by(hh_id: hh_response_id)&.refusal_url
-      response = api_post(refusal_url)
-      if response.code == 200
-        issue.refusal!
+
+      if refusal_url
+        response = api_post(refusal_url)
+        if response.code.start_with?('2')
+          issue.refusal!
+        end
       end
     end
 
@@ -70,9 +73,11 @@ module Hh
     end
 
     def hh_response_save(hh_response)
+      #byebug
       refusal_url = hh_response['actions']
-        .find { |e| e['name'] == 'Отказ' }['templates']
-        .find { |e| e['name'] == "Шаблон быстрого отказа на отклик" }['url']
+        .find { |e| e['name'] == 'Отказ' }&['templates']
+        .find { |e| e['name'] == "Шаблон быстрого отказа на отклик" }&['url'] || nil
+
       HhResponse.create!(hh_id: hh_response['id'], refusal_url: refusal_url)
     end
 
