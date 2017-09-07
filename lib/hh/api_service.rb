@@ -52,7 +52,7 @@ module Hh
     end
 
     def send_refusal(issue_id)
-      byebug
+      #byebug
       issue = Issue.find(issue_id)
       hh_response_id = issue.hh_response_id
       refusal_url = HhResponse.find_by(hh_id: hh_response_id)&.refusal_url
@@ -165,7 +165,6 @@ module Hh
       }
       request = Net::HTTP::Post.new(uri.request_uri, header)
       response = http.request(request)
-      JSON.parse(response.body)
     end
 
     def logger
