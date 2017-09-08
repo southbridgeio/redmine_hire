@@ -1,6 +1,6 @@
 <%= refusal_url = HhResponse.find_by(hh_id: @issue.hh_response_id)&.refusal_url %>
 
-<% if refusal_url.blank? %>
+<% if refusal_url.present? %>
   <script>
     $("body").attr("data-issue-id", "<%= @issue.id %>");
   </script>

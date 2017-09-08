@@ -21,7 +21,6 @@ module Hh
           vacancy_responses = get_vacancy_responses(vacancy['id'])
 
           vacancy_responses.each do |hh_response|
-            #byebug
             next if hh_response_present?(hh_response['id'].to_i)
             hh_response_save(hh_response)
 
@@ -52,7 +51,6 @@ module Hh
     end
 
     def send_refusal(issue_id)
-      #byebug
       issue = Issue.find(issue_id)
       hh_response_id = issue.hh_response_id
       refusal_url = HhResponse.find_by(hh_id: hh_response_id)&.refusal_url
@@ -60,9 +58,12 @@ module Hh
       if refusal_url
         response = api_post(refusal_url)
         if response.code.start_with?('2')
+          issue.journals.create!(user_id: issue.author_id, notes: 'Отказ отправлен!')
           issue.refusal!
         end
       end
+    rescue => e
+      logger.error e.to_s
     end
 
     private
