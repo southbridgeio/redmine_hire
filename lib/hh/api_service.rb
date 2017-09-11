@@ -75,7 +75,6 @@ module Hh
     #end
 
     def hh_response_save(hh_response)
-      #byebug
       refusal_url = hh_response['actions']
         .find { |e| e['name'] == 'Отказ' }&['templates']
         .find { |e| e['name'] == "Шаблон быстрого отказа на отклик" }&['url'] || nil
@@ -149,7 +148,6 @@ module Hh
       }
       request = Net::HTTP::Get.new(uri.request_uri, header)
       response = http.request(request)
-      #byebug
       response_body = JSON.parse(response.body)
       if response.code.start_with?('5') || response.code.start_with?('4')
         errors = response_body['errors'].map { |e| "#{e['type']}: #{e['value']}" }.join(', ')

@@ -3,6 +3,7 @@ require File.expand_path('../../test_helper', __FILE__)
 class HhApiServiceTest < ActiveSupport::TestCase
 
   context 'execute' do
+
     setup do
       stub_request(:get, "#{Hh::ApiService::BASE_URL}/employers/#{Hh::ApiService::EMPLOYER_ID}/vacancies/archived")
         .to_return body: "{\"per_page\":20,\"items\":[{\"salary\":{\"to\":75000,\"gross\":false,\"from\":45000,\"currency\":\"RUR\"},\"archived\":true,\"premium\":false,\"name\":\"\xD0\xA1\xD0\xB8\xD1\x81\xD1\x82\xD0\xB5\xD0\xBC\xD0\xBD\xD1\x8B\xD0\xB9 \xD0\xB0\xD0\xB4\xD0\xBC\xD0\xB8\xD0\xBD\xD0\xB8\xD1\x81\xD1\x82\xD1\x80\xD0\xB0\xD1\x82\xD0\xBE\xD1\x80 Linux\",\"area\":{\"url\":\"https://api.hh.ru/areas/103\",\"id\":\"103\",\"name\":\"\xD0\x90\xD0\xB1\xD0\xB0\xD0\xBA\xD0\xB0\xD0\xBD\"},\"url\":\"https://api.hh.ru/vacancies/22242092?host=hh.ru\",\"created_at\":\"2017-08-07T08:25:52+0300\",\"alternate_url\":\"https://hh.ru/vacancy/22242092\",\"apply_alternate_url\":\"https://hh.ru/applicant/vacancy_response?vacancyId=22242092\",\"relations\":[],\"employer\":{\"logo_urls\":{\"90\":\"https://hhcdn.ru/employer-logo/2038642.png\",\"240\":\"https://hhcdn.ru/employer-logo/2038643.png\",\"original\":\"https://hhcdn.ru/employer-logo-original/399140.png\"},\"vacancies_url\":\"https://api.hh.ru/vacancies?employer_id=1193714\",\"name\":\"Southbridge\",\"url\":\"https://api.hh.ru/employers/1193714\",\"alternate_url\":\"https://hh.ru/employer/1193714\",\"id\":\"1193714\",\"trusted\":true},\"response_letter_required\":true,\"published_at\":\"2017-08-07T08:25:52+0300\",\"archived_at\":\"2017-09-01T21:03:32+0300\",\"address\":null,\"department\":null,\"sort_point_distance\":null,\"type\":{\"id\":\"open\",\"name\":\"\xD0\x9E\xD1\x82\xD0\xBA\xD1\x80\xD1\x8B\xD1\x82\xD0\xB0\xD1\x8F\"},\"id\":\"22242092\",\"counters\":{\"responses\":10,\"invitations_and_responses\":10}}]}"
@@ -30,19 +31,20 @@ class HhApiServiceTest < ActiveSupport::TestCase
     #end
 
     should 'save new hh_response' do
-      Hh::ApiService.new.execute('archived')
+      subject
       assert_equal 1, HhResponse.count
     end
 
     should 'not save hh_response if hh_response exist' do
       HhResponse.create(hh_id: '973246529')
-      Hh::ApiService.new.execute('archived')
+      subject
       assert_equal 1, HhResponse.count
     end
 
-    should 'call IssueBuilder' do
-
-    end
+    #should 'call IssueBuilder' do
+    #  subject
+    #  assert_send([IssueBuilder.new, :execute])
+    #end
 
 
   end
