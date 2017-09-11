@@ -13,6 +13,7 @@ module Hh
     end
 
     def execute(vacancies_status)
+      #byebug
       vacancies = send("get_#{vacancies_status}_vacancies")
       vacancies.each do |vacancy|
         begin
@@ -21,7 +22,6 @@ module Hh
           vacancy_responses = get_vacancy_responses(vacancy['id'])
 
           vacancy_responses.each do |hh_response|
-            #byebug
             next if hh_response_present?(hh_response['id'].to_i)
             hh_response_save(hh_response)
 
@@ -47,8 +47,8 @@ module Hh
     def rollback! # for debug process
       Project.find_by(name: Hh::IssueBuilder::PROJECT_NAME).issues.where.not(resume_id: nil).destroy_all
       HhResponse.destroy_all
-      HhApplicant.destroy_all
-      HhVacancy.destroy_all
+      #HhApplicant.destroy_all
+      #HhVacancy.destroy_all
     end
 
     def send_refusal(issue_id)
