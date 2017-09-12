@@ -1,6 +1,6 @@
 gem 'byebug'
 
 group :test do
-  gem 'shoulda'
+  gem "mocha"
   gem "webmock"
 end

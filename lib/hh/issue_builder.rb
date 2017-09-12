@@ -63,9 +63,9 @@ module Hh
       xm.instruct!
       xm.ticket {
         xm.issue {
-          xm.project_id(Project.find_by(name: PROJECT_NAME).id)
+          xm.project_id(Project.find_by(name: PROJECT_NAME)&.id)
           xm.subject(build_subject)
-          xm.tracker_id(Tracker.find_by(name: ISSUE_TRACKER).id)
+          xm.tracker_id(Tracker.find_by(name: ISSUE_TRACKER)&.id)
           xm.description(build_comment)
         }
         xm.contact {
