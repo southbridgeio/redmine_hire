@@ -5,7 +5,7 @@ class RefusalWorker
     issue = Issue.find(issue_id)
 
     response = Hh::ApiService.new.api_post(refusal_url)
-    if response.code == 204
+    if response.code == '204'
       issue.refusal!
       issue.journals.create!(user_id: issue.author_id, notes: 'Отказ отправлен!')
     else

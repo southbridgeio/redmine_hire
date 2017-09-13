@@ -2,7 +2,7 @@ require File.expand_path('../../test_helper', __FILE__)
 
 class HhApiServiceTest < ActiveSupport::TestCase
 
-  context 'execute' do
+  context '.execute' do
 
     setup do
       stub_request(:get, "#{Hh::ApiService::BASE_URL}/employers/#{Hh::ApiService::EMPLOYER_ID}/vacancies/archived")
@@ -17,41 +17,28 @@ class HhApiServiceTest < ActiveSupport::TestCase
       stub_request(:get, "https://api.hh.ru/negotiations/973246529/messages")
         .to_return body: "{\"per_page\":20,\"items\":[{\"author\":{\"participant_type\":\"applicant\"},\"text\":\"Готов работать удаленно\",\"created_at\":\"2017-09-01T06:56:49+0300\",\"editable\":false,\"viewed_by_opponent\":true,\"viewed_by_me\":true,\"state\":{\"id\":\"response\",\"name\":\"Отклик\"},\"address\":null,\"id\":\"1229263042\"}],\"page\":0,\"pages\":1,\"found\":1}"
 
-      @params = {
-        vacancy_id: "22242092",
-        resume_id: "f88757a00003fb4920001236f26d6f676b4630",
-        hh_response_id: "973246529",
-        vacancy_name: "Системный администратор Linux",
-        applicant_city: "Абакан",
-        vacancy_city: "Абакан",
-        vacancy_link: "https://hh.ru/vacancy/22242092",
-        applicant_email: "akimov.rf@ya.ru",
-        applicant_first_name: "Дмитрий",
-        applicant_last_name: "Акимов",
-        applicant_middle_name: "Николаевич",
-        applicant_birth_date: "1989-10-31",
-        resume_link: "https://hh.ru/resume/f88757a00003fb4920001236f26d6f676b4630?t=973246529",
-        applicant_photo: nil,
-        salary: 100000,
-        experience: [{"industries"=>[{"id"=>"36.403", "name"=>"Государственные организации"}], "end"=>nil, "description"=>"Поддержка различных программно-технических комплексов на основе:\r\n• Операционные системы: Windows (2003-2012), Linux (Red Hat, Ubuntu).\r\n• СУБД: IBM DB2, Oracle Database, Cache InterSystems, MySQL, MSSQL.\r\n• Сервера приложений: IBM WebSphere, Apache, GlassFish, IIS, Oracle Weblogic.\r\n• Языки программирования: Знание: С#, Delphi, Опыт программирования на Java, Python Visual Basic, PHP, C/С++. Опыт работы с bash, vbs. Без проблем освою любой язык программирования.\r\n• ПО виртуализации: VMware Infrastructure (удостоверение о повышении квалификации), VirtualBox.\r\n• Опыт поддержки системы Oracle Identity Management\r\n• Система обмена сообщениями IBM WebSphere MQ\r\n• Система резервного копирования IBM TSM. \r\n• Система событийного мониторинга IBM Tivoli Monitoring\r\n• Работа с системами хранения QNAP, IBM Storvize\r\n• Настройка сетевого оборудования Cisco, Extreme Networks, 3COM.", "area"=>{"url"=>"https://api.hh.ru/areas/1187", "id"=>"1187", "name"=>"Республика Хакасия"}, "company_url"=>"http://www.pfrf.ru/", "industry"=>nil, "company_id"=>nil, "employer"=>nil, "start"=>"2012-11-01", "position"=>"Ведущий специалист-эксперт отдела информационных технологий", "company"=>"ГУ Отделение Пенсионного Фонда РФ по РХ"}, {"industries"=>[{"id"=>"48.681", "name"=>"Лечебно-профилактические учреждения"}], "end"=>"2013-04-01", "description"=>"- Поддержка работы программно-технического комплекса: \"Комплексная медицинская информационная система\" (КМИС) - IBM Lotus Domino.\r\n- Поддержка работы сети, AD, различного общесистемного и прикладного ПО.", "area"=>{"url"=>"https://api.hh.ru/areas/1187", "id"=>"1187", "name"=>"Республика Хакасия"}, "company_url"=>nil, "industry"=>nil, "company_id"=>nil, "employer"=>nil, "start"=>"2012-08-01", "position"=>"Инженер-программист", "company"=>"МБУЗ «Клинический родильный дом»"}],
-        description: "• Поддержка программно-аппаратных комплексов различного уровня сложности (развертывание, настройка, обновление, обслуживание, резервное копирование и т.п.)\r\n• Опыт внедрения программно-аппаратных комплексов.\r\n• Разработка и проектирование баз данных (SQL) и программных комплексов. Анализ, проектирование, составление технического задания, разработка, внедрение.\r\n• Быстрое обучение требуемому языку программирования.\r\n• Поддержка виртуальной инфраструктуры (проектирование, развертывание, настройка, поддержка и т.п.).",
-        cover_letter: "Готов работать удаленно"
-      }
-
       Hh::IssueBuilder.stubs(:new).returns(true)
     end
 
     subject { Hh::ApiService.new.execute('archived') }
 
-    #should 'save vacancy data' do
-    #  Hh::ApiService.new.execute('archived')
-    #  assert_equal HhVacancy.count, 1
-    #end
+    should 'call all api methods' do
+      subject
+      assert_requested :get, "#{Hh::ApiService::BASE_URL}/employers/#{Hh::ApiService::EMPLOYER_ID}/vacancies/archived"
+      assert_requested :get, "#{Hh::ApiService::BASE_URL}/negotiations/response?vacancy_id=22242092"
+      assert_requested :get, "https://api.hh.ru/resumes/f88757a00003fb4920001236f26d6f676b4630?topic_id=973246529"
+      assert_requested :get, "https://api.hh.ru/negotiations/973246529/messages"
+    end
 
-    #should 'save hh_applicant data' do
-    #  Hh::ApiService.new.execute('archived')
-    #  assert_equal HhApplicant.count, 1
-    #end
+    should 'save vacancy data' do
+      subject
+      assert_equal 1, HhVacancy.count
+    end
+
+    should 'save hh_applicant data' do
+      subject
+      assert_equal 1, HhApplicant.count
+    end
 
     should 'save new hh_response' do
       subject
@@ -64,9 +51,27 @@ class HhApiServiceTest < ActiveSupport::TestCase
       assert_equal 1, HhResponse.count
     end
 
-    should 'call IssueBuilder with api data' do
-      assert_send([Hh::IssueBuilder, :new, @params])
-      subject
+  end
+
+  context '.send_refusal' do
+
+    setup do
+      stub_request(:post, 'https://api.hh.ru/send_refusal')
+        .to_return status: '204'
+
+      hh_response_id = 222
+      @issue_id = 111
+
+      Issue.create(id: @issue_id, hh_response_id: hh_response_id)
+      HhResponse.create(hh_id: hh_response_id, refusal_url: 'https://api.hh.ru/send_refusal')
     end
+
+    subject { Hh::ApiService.new.send_refusal(@issue_id) }
+
+    #should 'set issue status to refusal' do
+    #  subject
+    #  assert_equal 'refusal', Issue.last.status
+    #end
+
   end
 end

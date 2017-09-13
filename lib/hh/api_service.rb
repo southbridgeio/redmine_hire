@@ -17,7 +17,7 @@ module Hh
       vacancies = send("get_#{vacancies_status}_vacancies")
       vacancies.each do |vacancy|
         begin
-          #vacancy_save(vacancy)
+          vacancy_save(vacancy)
 
           vacancy_responses = get_vacancy_responses(vacancy['id'])
 
@@ -28,7 +28,7 @@ module Hh
             raise "Resume empty" if hh_response['resume'].blank?
 
             resume = api_get(hh_response['resume']['url'])
-            #applicant_save(resume)
+            applicant_save(resume)
 
             cover_letter = get_cover_letter(hh_response['messages_url'])
 
@@ -80,7 +80,7 @@ module Hh
       request = Net::HTTP::Get.new(uri.request_uri, header)
       response = http.request(request)
       response_body = JSON.parse(response.body)
-      if response.code != 200
+      if response.code != '200'
         errors = response_body['errors'].map { |e| "#{e['type']}: #{e['value']}" }.join(', ')
         raise "HH API Error: #{errors}"
       end
@@ -102,10 +102,10 @@ module Hh
 
     private
 
-    #def vacancy_save(vacancy)
-    #  vacancy = HhVacancy.find_or_create_by!(hh_id: vacancy['id'])
-    #  vacancy.update!(info: vacancy, info_updated_at: DateTime.current)
-    #end
+    def vacancy_save(vacancy)
+      vacancy = HhVacancy.find_or_create_by!(hh_id: vacancy['id'])
+      vacancy.update!(info: vacancy, info_updated_at: DateTime.current)
+    end
 
     def hh_response_save(hh_response)
       refusal_url = hh_response['actions']
@@ -115,10 +115,10 @@ module Hh
       HhResponse.create!(hh_id: hh_response['id'], refusal_url: refusal_url)
     end
 
-    #def applicant_save(resume)
-    #  hh_applicant = HhApplicant.find_or_create_by!(hh_id: resume['id'])
-    #  hh_applicant.update!(resume: resume, resume_updated_at: DateTime.current)
-    #end
+    def applicant_save(resume)
+      hh_applicant = HhApplicant.find_or_create_by!(hh_id: resume['id'])
+      hh_applicant.update!(resume: resume, resume_updated_at: DateTime.current)
+    end
 
     # GET /employers/{employer_id}/vacancies/active // получаем все активные вакансии
     def get_active_vacancies

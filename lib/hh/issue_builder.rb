@@ -19,7 +19,7 @@ module Hh
     def execute
       return if Issue.where(vacancy_id: api_data[:vacancy_id], resume_id: api_data[:resume_id]).present?
       response = helpdesk_api_post
-      raise "Helpdesk API Error" if (response.code.start_with?('5') || response.code.start_with?('4'))
+      raise "Helpdesk API Error" unless response.code.start_with?('2')
 
       new_issue_id = response.body.gsub(/[^\d]/, '')
       new_issue_status_id = IssueStatus.find_by(name: ISSUE_STATUS)&.id
