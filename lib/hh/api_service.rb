@@ -47,24 +47,57 @@ module Hh
     def rollback! # for debug process
       Project.find_by(name: Hh::IssueBuilder::PROJECT_NAME).issues.where.not(resume_id: nil).destroy_all
       HhResponse.destroy_all
-      #HhApplicant.destroy_all
-      #HhVacancy.destroy_all
+      HhApplicant.destroy_all
+      HhVacancy.destroy_all
     end
 
     def send_refusal(issue_id)
       issue = Issue.find(issue_id)
-      hh_response_id = issue.hh_response_id
-      refusal_url = HhResponse.find_by(hh_id: hh_response_id)&.refusal_url
+      hh_response = HhResponse.find_by(hh_id: issue&.hh_response_id)
+      refusal_url = hh_response&.refusal_url
 
-      if refusal_url
-        response = api_post(refusal_url)
-        if response.code.start_with?('2')
-          issue.journals.create!(user_id: issue.author_id, notes: 'Отказ отправлен!')
-          issue.refusal!
-        end
+      return if refusal_url.blank?
+
+      if sidekiq_present?
+        RefusalWorker.perform_async(issue_id, refusal_url)
+      else
+        RefusalWorker.new.perform(issue_id, refusal_url)
       end
+
     rescue => e
       logger.error e.to_s
+    end
+
+    def api_get(url)
+      uri = URI.parse(url)
+      http = Net::HTTP.new(uri.host, uri.port)
+      http.use_ssl = true
+      header = {
+        "Content-Type" => "application/json",
+        "Authorization" => "Bearer #{ACCESS_TOKEN}",
+        "User-Agent" => USER_AGENT
+      }
+      request = Net::HTTP::Get.new(uri.request_uri, header)
+      response = http.request(request)
+      response_body = JSON.parse(response.body)
+      if response.code != 200
+        errors = response_body['errors'].map { |e| "#{e['type']}: #{e['value']}" }.join(', ')
+        raise "HH API Error: #{errors}"
+      end
+      response_body
+    end
+
+    def api_post(url)
+      uri = URI.parse(url)
+      http = Net::HTTP.new(uri.host, uri.port)
+      http.use_ssl = true
+      header = {
+        "Content-Type" => "application/json",
+        "Authorization" => "Bearer #{ACCESS_TOKEN}",
+        "User-Agent" => USER_AGENT
+      }
+      request = Net::HTTP::Post.new(uri.request_uri, header)
+      response = http.request(request)
     end
 
     private
@@ -137,36 +170,9 @@ module Hh
       }
     end
 
-    def api_get(url)
-      uri = URI.parse(url)
-      http = Net::HTTP.new(uri.host, uri.port)
-      http.use_ssl = true
-      header = {
-        "Content-Type" => "application/json",
-        "Authorization" => "Bearer #{ACCESS_TOKEN}",
-        "User-Agent" => USER_AGENT
-      }
-      request = Net::HTTP::Get.new(uri.request_uri, header)
-      response = http.request(request)
-      response_body = JSON.parse(response.body)
-      if response.code.start_with?('5') || response.code.start_with?('4')
-        errors = response_body['errors'].map { |e| "#{e['type']}: #{e['value']}" }.join(', ')
-        raise "HH API Error: #{errors}"
-      end
-      response_body
-    end
-
-    def api_post(url)
-      uri = URI.parse(url)
-      http = Net::HTTP.new(uri.host, uri.port)
-      http.use_ssl = true
-      header = {
-        "Content-Type" => "application/json",
-        "Authorization" => "Bearer #{ACCESS_TOKEN}",
-        "User-Agent" => USER_AGENT
-      }
-      request = Net::HTTP::Post.new(uri.request_uri, header)
-      response = http.request(request)
+    def sidekiq_present?
+      sidekiq = Sidekiq rescue nil
+      sidekiq.present?
     end
 
     def logger

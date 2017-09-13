@@ -97,9 +97,5 @@ module Hh
       "#{api_data[:vacancy_name]} #{api_data[:applicant_city].present? ? '('+api_data[:applicant_city]+')' : nil}"
     end
 
-    def logger
-      @logger ||= Logger.new(Rails.root.join('log', 'redmine_hire.log'))
-    end
-
   end
 end
