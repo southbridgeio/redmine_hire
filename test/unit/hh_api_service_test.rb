@@ -1,6 +1,7 @@
 require File.expand_path('../../test_helper', __FILE__)
 
 class HhApiServiceTest < ActiveSupport::TestCase
+  fixtures :issues, :projects, :trackers
 
   context '.execute' do
 
@@ -17,7 +18,7 @@ class HhApiServiceTest < ActiveSupport::TestCase
       stub_request(:get, "https://api.hh.ru/negotiations/973246529/messages")
         .to_return body: "{\"per_page\":20,\"items\":[{\"author\":{\"participant_type\":\"applicant\"},\"text\":\"Готов работать удаленно\",\"created_at\":\"2017-09-01T06:56:49+0300\",\"editable\":false,\"viewed_by_opponent\":true,\"viewed_by_me\":true,\"state\":{\"id\":\"response\",\"name\":\"Отклик\"},\"address\":null,\"id\":\"1229263042\"}],\"page\":0,\"pages\":1,\"found\":1}"
 
-      Hh::IssueBuilder.stubs(:new).returns(true)
+      Hh::IssueBuilder.any_instance.stubs(:execute).returns(true)
     end
 
     subject { Hh::ApiService.new.execute('archived') }
@@ -57,21 +58,40 @@ class HhApiServiceTest < ActiveSupport::TestCase
 
     setup do
       stub_request(:post, 'https://api.hh.ru/send_refusal')
-        .to_return status: '204'
+        .to_return body: '', status: '204'
 
-      hh_response_id = 222
-      @issue_id = 111
-
-      Issue.create(id: @issue_id, hh_response_id: hh_response_id)
-      HhResponse.create(hh_id: hh_response_id, refusal_url: 'https://api.hh.ru/send_refusal')
+      #project = Project.create(name: 'Работа', identifier: 'p_1')
+      #issue_status = IssueStatus.create(name: 'Новая')
+      #tracker = Tracker.create(name: 'Основной', default_status_id: 1)
+      #user = User.new(login: 'redmine_hire', firstname: 'Name', lastname: 'Lastname')
+      #user.validate
+      #user.email_address.address = 'test@mail.ru'
+      #user.save
+#
+      #Issue.create(
+      #  id: @issue_id,
+      #  hh_response_id: hh_response_id,
+      #  project_id: project.id,
+      #  status_id: issue_status.id,
+      #  tracker_id: tracker.id,
+      #  author_id: user.id,
+      #  subject: 'test'
+      #)
+      HhResponse.create(hh_id: 222, refusal_url: 'https://api.hh.ru/send_refusal')
+      projects(:project_1)
+      trackers(:tracker_1)
+      issue = issues(:issue_1)
+      byebug
+      Hh::ApiService.any_instance.stubs(:sidekiq_present?).returns(false)
     end
 
-    subject { Hh::ApiService.new.send_refusal(@issue_id) }
+    subject { Hh::ApiService.new.send_refusal(111) }
 
-    #should 'set issue status to refusal' do
-    #  subject
-    #  assert_equal 'refusal', Issue.last.status
-    #end
+    should 'set issue status to refusal' do
+      #byebug
+      subject
+      assert_equal 'refusal', Issue.last.status
+    end
 
   end
 end

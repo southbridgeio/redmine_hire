@@ -1,9 +1,10 @@
- issue_1:
-    id: 1
-    tracker_id: 1
-    project_id: 1
-    subject: "MyTestIssue"
-    description: "MyDescription"
-    status_id: 1
-    priority_id: 4
-    author_id: 1
+issue_1:
+  id: 111
+  tracker: tracker_1
+  project: project_1
+  subject: "MyTestIssue"
+  description: "MyDescription"
+  status_id: 1
+  priority_id: 4
+  author_id: 1
+  hh_response_id: 222

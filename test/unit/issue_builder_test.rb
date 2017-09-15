@@ -43,23 +43,25 @@ class HhIssueBuilderTest < ActiveSupport::TestCase
       user.save
 
       #Issue.create(project_id: 1, subject: 'test', tracker_id: 1)
+
       issues(:issue_1)
     end
 
     subject { Hh::IssueBuilder.new(@params).execute }
 
-    should 'raise error if helpdesk_api_post fail' do
-      stub_request(:post, "#{Setting['protocol']}://#{Setting['host_name']}/helpdesk/create_ticket.xml")
-        .to_return body: "", status: '401'
+    #should 'raise error if helpdesk_api_post fail' do
+    #  stub_request(:post, "#{Setting['protocol']}://#{Setting['host_name']}/helpdesk/create_ticket.xml")
+    #    .to_return body: "", status: '401'
+#
+    #  assert_raises(Exception) { subject }
+    #end
+#
+    #should 'save new issue' do
+    #  subject
+    #  assert_equal 1, Issue.count
+    #end
 
-      assert_raises(Exception) { subject }
-    end
 
-    should 'save new issue' do
-      byebug
-      subject
-      assert_equal 1, Issue.count
-    end
 
     #should 'not save new issue if vacancy + resume exist' do
     #  Issue.create(vacancy_id: "22242092", resume_id: "f88757a00003fb4920001236f26d6f676b4630")

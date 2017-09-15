@@ -1,7 +1,9 @@
 ActionDispatch::Callbacks.to_prepare do
-  paths = '/lib/**/*.rb'
-  Dir.glob(File.dirname(__FILE__) + paths).each do |file|
-    require_dependency file
+  paths = ['/lib/**/*.rb', '/app/worker/*.rb']
+  paths.each do |path|
+    Dir.glob(File.dirname(__FILE__) + path).each do |file|
+      require_dependency file
+    end
   end
 end
 

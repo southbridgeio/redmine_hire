@@ -80,6 +80,7 @@ module Hh
       request = Net::HTTP::Get.new(uri.request_uri, header)
       response = http.request(request)
       response_body = JSON.parse(response.body)
+
       if response.code != '200'
         errors = response_body['errors'].map { |e| "#{e['type']}: #{e['value']}" }.join(', ')
         raise "HH API Error: #{errors}"
