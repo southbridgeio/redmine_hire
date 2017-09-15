@@ -21,7 +21,7 @@ Redmine::Plugin.register :redmine_hire do
     'project_name' => '',
     'issue_status' => '',
     'issue_tracker' => '',
-    'issue_autor' => '',
+    'issue_author' => '',
     'redmine_api_key' => ''
   }, :partial => 'settings/redmine_hire_settings'
 end

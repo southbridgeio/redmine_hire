@@ -57,40 +57,52 @@ class HhApiServiceTest < ActiveSupport::TestCase
   context '.send_refusal' do
 
     setup do
-      stub_request(:post, 'https://api.hh.ru/send_refusal')
-        .to_return body: '', status: '204'
-
-      #project = Project.create(name: 'Работа', identifier: 'p_1')
-      #issue_status = IssueStatus.create(name: 'Новая')
-      #tracker = Tracker.create(name: 'Основной', default_status_id: 1)
-      #user = User.new(login: 'redmine_hire', firstname: 'Name', lastname: 'Lastname')
-      #user.validate
-      #user.email_address.address = 'test@mail.ru'
-      #user.save
-#
-      #Issue.create(
-      #  id: @issue_id,
-      #  hh_response_id: hh_response_id,
-      #  project_id: project.id,
-      #  status_id: issue_status.id,
-      #  tracker_id: tracker.id,
-      #  author_id: user.id,
-      #  subject: 'test'
-      #)
-      HhResponse.create(hh_id: 222, refusal_url: 'https://api.hh.ru/send_refusal')
-      projects(:project_1)
-      trackers(:tracker_1)
-      issue = issues(:issue_1)
-      byebug
+      @hh_response = HhResponse.create(hh_id: 222, refusal_url: 'https://api.hh.ru/send_refusal')
+      @issue = issues(:issue_1)
       Hh::ApiService.any_instance.stubs(:sidekiq_present?).returns(false)
     end
 
     subject { Hh::ApiService.new.send_refusal(111) }
 
-    should 'set issue status to refusal' do
-      #byebug
-      subject
-      assert_equal 'refusal', Issue.last.status
+    context 'if api response success' do
+
+      setup do
+        stub_request(:post, 'https://api.hh.ru/send_refusal')
+          .to_return body: '', status: '204'
+      end
+
+      should 'set issue status to refusal' do
+        subject
+        assert_equal 'refusal', @issue.reload.hiring_status
+      end
+
+      should 'create issue journal' do
+        subject
+        assert_equal 1, @issue.reload.journals.count
+      end
+    end
+
+    context 'if api response fail' do
+
+      setup do
+        stub_request(:post, 'https://api.hh.ru/send_refusal')
+          .to_return body: '', status: '404'
+      end
+
+      should 'delete refusal_url from hh_response' do
+        subject
+        assert_equal nil, @hh_response.reload.refusal_url
+      end
+
+      should 'issue status' do
+        subject
+        assert_equal 'not_status', @issue.reload.hiring_status
+      end
+
+      should 'create issue journal' do
+        subject
+        assert_equal 1, @issue.reload.journals.count
+      end
     end
 
   end

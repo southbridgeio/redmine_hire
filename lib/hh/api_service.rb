@@ -13,7 +13,6 @@ module Hh
     end
 
     def execute(vacancies_status)
-      #byebug
       vacancies = send("get_#{vacancies_status}_vacancies")
       vacancies.each do |vacancy|
         begin

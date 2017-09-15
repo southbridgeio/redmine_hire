@@ -1,17 +1,13 @@
 require File.expand_path('../../test_helper', __FILE__)
 
 class HhIssueBuilderTest < ActiveSupport::TestCase
+  fixtures :issues, :projects, :trackers, :issue_statuses
 
   context 'execute' do
 
     setup do
-      Setting.plugin_redmine_hire['project_name'] = 'Работа'
-      Setting.plugin_redmine_hire['issue_status'] = 'Новая'
-      Setting.plugin_redmine_hire['issue_tracker'] = 'Основной'
-      Setting.plugin_redmine_hire['issue_autor'] = 'redmine_hire'
-
-      stub_request(:post, "#{Setting['protocol']}://#{Setting['host_name']}/helpdesk/create_ticket.xml")
-        .to_return body: "Issue 1 created", status: '201'
+      Hh::IssueBuilder.const_set(:ISSUE_STATUS, 'Новая')
+      Hh::IssueBuilder.const_set(:ISSUE_AUTHOR, 'redmine_hire')
 
       @params = {
         vacancy_id: "22242092",
@@ -34,47 +30,35 @@ class HhIssueBuilderTest < ActiveSupport::TestCase
         cover_letter: "Готов работать удаленно"
       }
 
-      Project.create(name: 'Работа', identifier: 'p_1')
-      IssueStatus.create(name: 'Новая')
-      Tracker.create(name: 'Основной', default_status_id: 1)
-      user = User.new(login: 'redmine_hire', firstname: 'Name', lastname: 'Lastname')
-      user.validate
-      user.email_address.address = 'test@mail.ru'
-      user.save
-
-      #Issue.create(project_id: 1, subject: 'test', tracker_id: 1)
-
-      issues(:issue_1)
+      @user = User.new(login: 'redmine_hire', firstname: 'Name', lastname: 'Lastname')
+      @user.validate
+      @user.email_address.address = 'test@mail.ru'
+      @user.save
     end
 
     subject { Hh::IssueBuilder.new(@params).execute }
 
-    #should 'raise error if helpdesk_api_post fail' do
-    #  stub_request(:post, "#{Setting['protocol']}://#{Setting['host_name']}/helpdesk/create_ticket.xml")
-    #    .to_return body: "", status: '401'
-#
-    #  assert_raises(Exception) { subject }
-    #end
-#
-    #should 'save new issue' do
-    #  subject
-    #  assert_equal 1, Issue.count
-    #end
+    should 'raise error if helpdesk_api_post fail' do
+      stub_request(:post, "#{Setting['protocol']}://#{Setting['host_name']}/helpdesk/create_ticket.xml")
+        .to_return body: "", status: '401'
 
+      assert_raises(Exception) { subject }
+    end
 
+    should 'assign issue attributes' do
+      stub_request(:post, "#{Setting['protocol']}://#{Setting['host_name']}/helpdesk/create_ticket.xml")
+        .to_return body: "Issue 2 created", status: '201'
 
-    #should 'not save new issue if vacancy + resume exist' do
-    #  Issue.create(vacancy_id: "22242092", resume_id: "f88757a00003fb4920001236f26d6f676b4630")
-    #  subject
-    #  assert_equal 1, Issue.count
-    #end
-#
-    #should 'assign issue attributes' do
-    #  subject
-    #  issue = Issue.last
-    #  assert_equal "22242092", issue.vacancy_id
-    #end
+      subject
+      issue = Issue.find(2)
+      status = IssueStatus.find(1)
 
+      assert_equal @params[:vacancy_id].to_i, issue.vacancy_id
+      assert_equal @params[:resume_id], issue.resume_id
+      assert_equal status.id, issue.status_id
+      assert_equal @user.id, issue.author_id
+      assert_equal @params[:hh_response_id].to_i, issue.hh_response_id
+    end
 
   end
 end

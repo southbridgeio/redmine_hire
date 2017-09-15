@@ -7,7 +7,7 @@ module Hh
     PROJECT_NAME = Setting.plugin_redmine_hire['project_name']
     ISSUE_STATUS = Setting.plugin_redmine_hire['issue_status']
     ISSUE_TRACKER = Setting.plugin_redmine_hire['issue_tracker']
-    ISSUE_AUTOR = Setting.plugin_redmine_hire['issue_autor']
+    ISSUE_AUTHOR = Setting.plugin_redmine_hire['issue_author']
     REDMINE_API_KEY = Setting.plugin_redmine_hire['redmine_api_key']
 
     attr_reader :api_data
@@ -23,7 +23,7 @@ module Hh
 
       new_issue_id = response.body.gsub(/[^\d]/, '')
       new_issue_status_id = IssueStatus.find_by(name: ISSUE_STATUS)&.id
-      new_issue_author = User.find_by(login: ISSUE_AUTOR) || User.find_by(status: User::STATUS_ANONYMOUS)
+      new_issue_author = User.find_by(login: ISSUE_AUTHOR) || User.find_by(status: User::STATUS_ANONYMOUS)
       Issue.find(new_issue_id).update!(
         vacancy_id: api_data[:vacancy_id],
         resume_id: api_data[:resume_id],
@@ -39,7 +39,7 @@ module Hh
       #  i.subject = build_subject
       #  i.status = IssueStatus.find_by(name: ISSUE_STATUS)
       #  i.tracker = Tracker.find_by(name: ISSUE_TRACKER)
-      #  i.author = User.find_by(login: ISSUE_AUTOR)
+      #  i.author = User.find_by(login: ISSUE_AUTHOR)
       #  i.description = build_comment
       #end
     end
