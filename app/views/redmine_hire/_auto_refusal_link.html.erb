@@ -1,5 +1,8 @@
 <%= refusal_url = HhResponse.find_by(hh_id: @issue.hh_response_id)&.refusal_url %>
 
-<% if refusal_url.blank? %>
-  <%= link_to 'Отказать' %>
+<% if refusal_url.present? %>
+  <script>
+    $("body").attr("data-issue-id", "<%= @issue.id %>");
+  </script>
+  <%= javascript_include_tag :redmine_hire_common, :plugin => :redmine_hire %>
 <% end %>

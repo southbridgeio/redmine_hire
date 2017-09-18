@@ -7,7 +7,7 @@ module Hh
     PROJECT_NAME = Setting.plugin_redmine_hire['project_name']
     ISSUE_STATUS = Setting.plugin_redmine_hire['issue_status']
     ISSUE_TRACKER = Setting.plugin_redmine_hire['issue_tracker']
-    ISSUE_AUTOR = Setting.plugin_redmine_hire['issue_autor']
+    ISSUE_AUTHOR = Setting.plugin_redmine_hire['issue_author']
     REDMINE_API_KEY = Setting.plugin_redmine_hire['redmine_api_key']
 
     attr_reader :api_data
@@ -19,11 +19,11 @@ module Hh
     def execute
       return if Issue.where(vacancy_id: api_data[:vacancy_id], resume_id: api_data[:resume_id]).present?
       response = helpdesk_api_post
-      raise "Helpdesk API Error" if (response.code.start_with?('5') || response.code.start_with?('4'))
+      raise "Helpdesk API Error" unless response.code.start_with?('2')
 
       new_issue_id = response.body.gsub(/[^\d]/, '')
       new_issue_status_id = IssueStatus.find_by(name: ISSUE_STATUS)&.id
-      new_issue_author = User.find_by(login: ISSUE_AUTOR) || User.find_by(status: User::STATUS_ANONYMOUS)
+      new_issue_author = User.find_by(login: ISSUE_AUTHOR) || User.find_by(status: User::STATUS_ANONYMOUS)
       Issue.find(new_issue_id).update!(
         vacancy_id: api_data[:vacancy_id],
         resume_id: api_data[:resume_id],
@@ -39,7 +39,7 @@ module Hh
       #  i.subject = build_subject
       #  i.status = IssueStatus.find_by(name: ISSUE_STATUS)
       #  i.tracker = Tracker.find_by(name: ISSUE_TRACKER)
-      #  i.author = User.find_by(login: ISSUE_AUTOR)
+      #  i.author = User.find_by(login: ISSUE_AUTHOR)
       #  i.description = build_comment
       #end
     end
@@ -63,9 +63,9 @@ module Hh
       xm.instruct!
       xm.ticket {
         xm.issue {
-          xm.project_id(Project.find_by(name: PROJECT_NAME).id)
+          xm.project_id(Project.find_by(name: PROJECT_NAME)&.id)
           xm.subject(build_subject)
-          xm.tracker_id(Tracker.find_by(name: ISSUE_TRACKER).id)
+          xm.tracker_id(Tracker.find_by(name: ISSUE_TRACKER)&.id)
           xm.description(build_comment)
         }
         xm.contact {
@@ -95,10 +95,6 @@ module Hh
 
     def build_subject
       "#{api_data[:vacancy_name]} #{api_data[:applicant_city].present? ? '('+api_data[:applicant_city]+')' : nil}"
-    end
-
-    def logger
-      @logger ||= Logger.new(Rails.root.join('log', 'redmine_hire.log'))
     end
 
   end

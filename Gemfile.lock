@@ -1,12 +1,28 @@
 GEM
   specs:
+    addressable (2.5.1)
+      public_suffix (~> 2.0, >= 2.0.2)
     byebug (9.0.6)
+    crack (0.4.3)
+      safe_yaml (~> 1.0.0)
+    hashdiff (0.3.4)
+    metaclass (0.0.4)
+    mocha (1.2.1)
+      metaclass (~> 0.0.1)
+    public_suffix (2.0.5)
+    safe_yaml (1.0.4)
+    webmock (3.0.1)
+      addressable (>= 2.3.6)
+      crack (>= 0.3.2)
+      hashdiff
 
 PLATFORMS
   ruby
 
 DEPENDENCIES
   byebug
+  mocha
+  webmock
 
 BUNDLED WITH
    1.14.6
