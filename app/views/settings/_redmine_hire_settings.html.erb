@@ -27,48 +27,32 @@
     <tr>
       <th>Project Name</th>
       <td>
-        <input
-          type="text"
-          id="settings_project_name"
-          value="<%= settings['project_name'] %>"
-          name="settings[project_name]"
-        >
+        <%= select_tag 'settings[project_name]',
+          options_for_select(Project.pluck(:name), Setting.plugin_redmine_hire['project_name']) %>
       </td>
     </tr>
 
     <tr>
       <th>Issue Status Name</th>
       <td>
-        <input
-          type="text"
-          id="settings_issue_status"
-          value="<%= settings['issue_status'] %>"
-          name="settings[issue_status]"
-        >
+        <%= select_tag 'settings[issue_status]',
+          options_for_select(IssueStatus.pluck(:name), Setting.plugin_redmine_hire['issue_status']) %>
       </td>
     </tr>
 
     <tr>
       <th>Issue Tracker Name</th>
       <td>
-        <input
-          type="text"
-          id="settings_issue_tracker"
-          value="<%= settings['issue_tracker'] %>"
-          name="settings[issue_tracker]"
-        >
+        <%= select_tag 'settings[issue_tracker]',
+          options_for_select(Tracker.pluck(:name), Setting.plugin_redmine_hire['issue_tracker']) %>
       </td>
     </tr>
 
     <tr>
       <th>Issue Author Login</th>
       <td>
-        <input
-          type="text"
-          id="settings_issue_author"
-          value="<%= settings['issue_author'] %>"
-          name="settings[issue_author]"
-        >
+        <%= select_tag 'settings[issue_author]',
+          options_for_select(User.pluck(:login), Setting.plugin_redmine_hire['issue_author']) %>
       </td>
     </tr>
 
