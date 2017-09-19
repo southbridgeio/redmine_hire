@@ -67,7 +67,24 @@
         >
       </td>
     </tr>
+
+    <% if Gem.loaded_specs.has_key?('sidekiq-cron') %>
+      <tr>
+        <th>HH Api Sync Cron</th>
+        <td>
+          <input
+            type="text"
+            id="settings_hh_api_sync_cron"
+            value="<%= settings['hh_api_sync_cron'] %>"
+            name="settings[hh_api_sync_cron]"
+          >
+        </td>
+      </tr>
+    <% end %>
+
   </tbody>
 </table>
 
-
+<% if Gem.loaded_specs.has_key?('sidekiq-cron') %>
+  <%= link_to 'Инициировать cron расписание', '/redmine_hire/init_sidekiq_jobs' %>
+<% end %>

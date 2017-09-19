@@ -22,6 +22,7 @@ Redmine::Plugin.register :redmine_hire do
     'issue_status' => '',
     'issue_tracker' => '',
     'issue_author' => '',
-    'redmine_api_key' => ''
+    'redmine_api_key' => '',
+    'hh_api_sync_cron' => ''
   }, :partial => 'settings/redmine_hire_settings'
 end
