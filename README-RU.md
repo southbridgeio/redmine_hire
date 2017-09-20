@@ -3,6 +3,7 @@
 ## redmine_hire
 
 Плагин предназначен для автоматизации работы с откликами сайта hh.ru.
+
 Плагин синхронизирует отклики по вашим вакансиям и создает на основе их задачи в Redmine.
 Для каждого отклика + соискателя создается отдельная задача c данными о вакансии и соискателе.
 
@@ -37,12 +38,16 @@ bundle exec rake redmine:plugins:migrate RAILS_ENV=production
 При синхронизации будут получены вакансии и созданы задачи из откликов соискателей.
 ### rake
 выполните rake команду в папке Redmine
+
 ```rake redmine_hire:hh_api_sync_active``` - синхронизирует все активные вакансии.
+
 ```rake redmine_hire:hh_api_sync_archived``` - синхронизирует все архивные вакансии (можете перед запуском установить статус для архивных задач в настройках плагина).
+
 ```rake redmine_hire:hh_api_rollback``` - удалит все созданные задачи для установленного проекта (если что-то пошло не так).
 
 ### whenever
 Вы можете использовать whenever для периодического запуска синхронизации.
+
 Просто добавьте ```rake redmine_hire:hh_api_sync_active``` в ваш schedule.rb
 
 ### sidekiq-cron
@@ -51,7 +56,8 @@ bundle exec rake redmine:plugins:migrate RAILS_ENV=production
 
 ## Интеграция с плагином redmine_contacts_helpdesk
 [Helpdesk](https://www.redmineup.com/pages/help/helpdesk) - документация плагина.
-Плагин готов для работы с Helpdesk, если у вас установлен этот плагин, задачи будут создавать через API Helpdesk с созданием и привязкой к задаче контакта, с данными (email, first_name, last_name) из резюме соискателя.
+
+Плагин готов для работы с Helpdesk. Если у вас установлен этот плагин, задачи будут создавать через API Helpdesk с созданием и привязкой к задаче контакта, с данными (email, first_name, last_name) из резюме соискателя.
 
 ## Быстрый отказ соискателю
 Плагин предоставляет возможность отправить соисателю быстрый отказ через HH API, если вакансия имеет ссылку на быстрый отказ.
@@ -62,6 +68,7 @@ bundle exec rake redmine:plugins:migrate RAILS_ENV=production
 
 ## Contributing
 Всегда будем рады вашим pull request.
+
 Для запуска тестов, запустите из папки Redmine:
 ```bundle exec rake redmine:plugins:test NAME=redmine_hire```
 
