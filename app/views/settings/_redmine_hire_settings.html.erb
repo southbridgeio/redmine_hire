@@ -87,4 +87,6 @@
 
 <% if Gem.loaded_specs.has_key?('sidekiq-cron') %>
   <%= link_to 'Инициировать cron расписание', '/redmine_hire/init_sidekiq_jobs' %>
+
+  <%= link_to 'Удалить cron расписание', '/redmine_hire/destroy_sidekiq_jobs' %>
 <% end %>

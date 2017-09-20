@@ -19,4 +19,9 @@ class RedmineHireController < ApplicationController
 
     redirect_to '/settings/plugin/redmine_hire'
   end
+
+  def destroy_sidekiq_jobs
+    Sidekiq::Cron::Job.destroy 'hh_api_sync_responses'
+    redirect_to '/settings/plugin/redmine_hire'
+  end
 end
