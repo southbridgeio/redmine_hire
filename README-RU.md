@@ -24,9 +24,6 @@ bundle exec rake redmine:plugins:migrate RAILS_ENV=production
 ```
 
 ## Настройка плагина
-
-### Общие настройки
-
 Перед началом работы необходимо сконфигурировать настройки плагина ```/settings/plugin/redmine_hire```
 
 * HH Access Token, HH Employer ID - токен и id для доступа к HH API. Можно получить в личном [кабинете](https://dev.hh.ru/admin)
@@ -37,6 +34,7 @@ bundle exec rake redmine:plugins:migrate RAILS_ENV=production
 * Redmine API Key - ключ для Redmine API. Можно получить в настройках учетных записей Redmine.
 
 ## Запуск синхронизации с HH API и создание задач
+При синхронизации будут получены вакансии и созданы задачи из откликов соискателей.
 ### rake
 выполните rake команду в папке Redmine
 ```rake redmine_hire:hh_api_sync_active``` - синхронизирует все активные вакансии.
