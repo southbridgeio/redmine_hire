@@ -1,2 +1,1 @@
-# redmine_hire
-Redmine plugin for hiring
+[Русская версия](README-RU.md)

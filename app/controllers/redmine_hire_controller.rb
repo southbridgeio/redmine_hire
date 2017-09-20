@@ -9,7 +9,7 @@ class RedmineHireController < ApplicationController
 
   def init_sidekiq_jobs
     hash = {
-      'hh api sync responses' => {
+      'hh_api_sync_responses' => {
         'class' => 'HhApiWorker',
         'cron'  => Setting.plugin_redmine_hire['hh_api_sync_cron']
       }
