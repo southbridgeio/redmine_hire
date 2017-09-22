@@ -1,4 +1,4 @@
-<%= refusal_url = HhResponse.find_by(hh_id: @issue.hh_response_id)&.refusal_url %>
+<% refusal_url = HhResponse.find_by(hh_id: @issue.hh_response_id)&.refusal_url %>
 
 <% if @issue.refusal? %>
   <p>Отказ отправлен</p>
