@@ -6,10 +6,15 @@ class HhIssueBuilderTest < ActiveSupport::TestCase
   context 'execute' do
 
     setup do
+      @user = User.new(login: 'redmine_hire', firstname: 'Name', lastname: 'Lastname')
+      @user.validate
+      @user.email_address.address = 'test@mail.ru'
+      @user.save
+
       Hh::IssueBuilder.const_set(:PROJECT_NAME, 'Работа')
       Hh::IssueBuilder.const_set(:ISSUE_STATUS_NAME, 'Новая')
       Hh::IssueBuilder.const_set(:ISSUE_TRACKER_NAME, 'Основной')
-      Hh::IssueBuilder.const_set(:ISSUE_AUTHOR, 'redmine_hire')
+      Hh::IssueBuilder.const_set(:ISSUE_AUTHOR, @user.id)
 
       @params = {
         vacancy_id: "22242092",
@@ -31,11 +36,6 @@ class HhIssueBuilderTest < ActiveSupport::TestCase
         description: "• Поддержка программно-аппаратных комплексов различного уровня сложности (развертывание, настройка, обновление, обслуживание, резервное копирование и т.п.)\r\n• Опыт внедрения программно-аппаратных комплексов.\r\n• Разработка и проектирование баз данных (SQL) и программных комплексов. Анализ, проектирование, составление технического задания, разработка, внедрение.\r\n• Быстрое обучение требуемому языку программирования.\r\n• Поддержка виртуальной инфраструктуры (проектирование, развертывание, настройка, поддержка и т.п.).",
         cover_letter: "Готов работать удаленно"
       }
-
-      @user = User.new(login: 'redmine_hire', firstname: 'Name', lastname: 'Lastname')
-      @user.validate
-      @user.email_address.address = 'test@mail.ru'
-      @user.save
     end
 
     subject { Hh::IssueBuilder.new(@params).execute }

@@ -24,25 +24,25 @@
 <p>
   <label for="settings[project_name]">Project Name</label>
   <%= select_tag 'settings[project_name]',
-          options_for_select(Project.pluck(:name), Setting.plugin_redmine_hire['project_name']) %>
+    options_for_select(Project.pluck(:name), Setting.plugin_redmine_hire['project_name']) %>
 </p>
 
 <p>
   <label for="settings[issue_status]">Issue Status Name</label>
   <%= select_tag 'settings[issue_status]',
-          options_for_select(IssueStatus.pluck(:name), Setting.plugin_redmine_hire['issue_status']) %>
+    options_for_select(IssueStatus.pluck(:name), Setting.plugin_redmine_hire['issue_status']) %>
 </p>
 
 <p>
   <label for="settings[issue_tracker]">Issue Tracker Name</label>
   <%= select_tag 'settings[issue_tracker]',
-          options_for_select(Tracker.pluck(:name), Setting.plugin_redmine_hire['issue_tracker']) %>
+    options_for_select(Tracker.pluck(:name), Setting.plugin_redmine_hire['issue_tracker']) %>
 </p>
 
 <p>
-  <label for="settings[issue_author]">Issue Author Login</label>
+  <label for="settings[issue_author]">Issue Author Name</label>
   <%= select_tag 'settings[issue_author]',
-          options_for_select(User.pluck(:login), Setting.plugin_redmine_hire['issue_author']) %>
+    options_for_select(User.all.map { |u| [u.name, u.id] }, Setting.plugin_redmine_hire['issue_author']) %>
 </p>
 
 <h3>Redmine data</h3>

@@ -19,7 +19,7 @@ module Hh
     def execute
       return if Issue.where(vacancy_id: api_data[:vacancy_id], resume_id: api_data[:resume_id]).present?
       new_issue_status = IssueStatus.find_or_create_by!(name: ISSUE_STATUS_NAME)
-      new_issue_author = User.find_by(login: ISSUE_AUTHOR) || User.find_by(status: User::STATUS_ANONYMOUS)
+      new_issue_author = User.find_by(id: ISSUE_AUTHOR) || User.find_by(status: User::STATUS_ANONYMOUS)
       if helpdesk_present?
         response = helpdesk_api_post
         raise "Helpdesk API Error" unless response.code.start_with?('2')

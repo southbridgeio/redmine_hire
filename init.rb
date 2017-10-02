@@ -10,9 +10,9 @@ end
 Redmine::Plugin.register :redmine_hire do
   name 'Redmine Hire plugin'
   author 'Southbridge'
-  description 'Plugin to work with the hire responses'
+  description 'Plugin to work with the hh.ru api service'
   version '0.0.1'
-  url 'http://example.com/path/to/plugin'
+  url 'https://github.com/centosadmin/redmine_hire'
   author_url 'https://github.com/centosadmin'
 
   settings :default => {
