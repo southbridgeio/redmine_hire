@@ -1,7 +1,11 @@
+<% content_for :header_tags do %>
+    <%= stylesheet_link_tag "redmine_hire.css", :plugin => "redmine_hire", :media => "screen" %>
+<% end %>
+
 <h3>hh.ru data</h3>
 <span>You can get in <%= link_to 'hh api', 'https://dev.hh.ru/admin' %></span>
 <p>
-  <label for="settings_hh_access_token">HH Access Token</label>
+  <label class='required' for="settings_hh_access_token">HH Access Token</label>
   <input
     type="text"
     id="settings_hh_access_token"
@@ -11,7 +15,7 @@
 </p>
 
 <p>
-  <label for="settings_hh_access_token">HH Employer ID</label>
+  <label class='required' for="settings_hh_access_token">HH Employer ID</label>
   <input
     type="text"
     id="settings_hh_employer_id"
@@ -22,19 +26,19 @@
 
 <h3>Issue attributes</h3>
 <p>
-  <label for="settings[project_name]">Project Name</label>
+  <label class='required' for="settings[project_name]">Project Name</label>
   <%= select_tag 'settings[project_name]',
     options_for_select(Project.pluck(:name), Setting.plugin_redmine_hire['project_name']) %>
 </p>
 
 <p>
-  <label for="settings[issue_status]">Issue Status Name</label>
+  <label class='required' for="settings[issue_status]">Issue Status Name</label>
   <%= select_tag 'settings[issue_status]',
     options_for_select(IssueStatus.pluck(:name), Setting.plugin_redmine_hire['issue_status']) %>
 </p>
 
 <p>
-  <label for="settings[issue_tracker]">Issue Tracker Name</label>
+  <label class='required' for="settings[issue_tracker]">Issue Tracker Name</label>
   <%= select_tag 'settings[issue_tracker]',
     options_for_select(Tracker.pluck(:name), Setting.plugin_redmine_hire['issue_tracker']) %>
 </p>
@@ -47,7 +51,7 @@
 
 <h3>Redmine data</h3>
 <p>
-  <label for="settings_redmine_api_key">Redmine API Key</label>
+  <label class='required' for="settings_redmine_api_key">Redmine API Key</label>
   <input
     type="text"
     id="settings_redmine_api_key"
