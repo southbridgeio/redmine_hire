@@ -1,92 +1,80 @@
-<table>
-  <tbody>
-    <tr>
-      <th>HH Access Token</th>
-      <td>
-        <input
-          type="text"
-          id="settings_hh_access_token"
-          value="<%= settings['hh_access_token'] %>"
-          name="settings[hh_access_token]"
-        >
-      </td>
-    </tr>
+<h3>hh.ru data</h3>
+<span>You can get in <%= link_to 'hh api', 'https://dev.hh.ru/admin' %></span>
+<p>
+  <label for="settings_hh_access_token">HH Access Token</label>
+  <input
+    type="text"
+    id="settings_hh_access_token"
+    value="<%= settings['hh_access_token'] %>"
+    name="settings[hh_access_token]"
+  >
+</p>
 
-    <tr>
-      <th>HH Employer ID</th>
-      <td>
-        <input
-          type="text"
-          id="settings_hh_employer_id"
-          value="<%= settings['hh_employer_id'] %>"
-          name="settings[hh_employer_id]"
-        >
-      </td>
-    </tr>
+<p>
+  <label for="settings_hh_access_token">HH Employer ID</label>
+  <input
+    type="text"
+    id="settings_hh_employer_id"
+    value="<%= settings['hh_employer_id'] %>"
+    name="settings[hh_employer_id]"
+  >
+</p>
 
-    <tr>
-      <th>Project Name</th>
-      <td>
-        <%= select_tag 'settings[project_name]',
+<h3>Issue attributes</h3>
+<p>
+  <label for="settings[project_name]">Project Name</label>
+  <%= select_tag 'settings[project_name]',
           options_for_select(Project.pluck(:name), Setting.plugin_redmine_hire['project_name']) %>
-      </td>
-    </tr>
+</p>
 
-    <tr>
-      <th>Issue Status Name</th>
-      <td>
-        <%= select_tag 'settings[issue_status]',
+<p>
+  <label for="settings[issue_status]">Issue Status Name</label>
+  <%= select_tag 'settings[issue_status]',
           options_for_select(IssueStatus.pluck(:name), Setting.plugin_redmine_hire['issue_status']) %>
-      </td>
-    </tr>
+</p>
 
-    <tr>
-      <th>Issue Tracker Name</th>
-      <td>
-        <%= select_tag 'settings[issue_tracker]',
+<p>
+  <label for="settings[issue_tracker]">Issue Tracker Name</label>
+  <%= select_tag 'settings[issue_tracker]',
           options_for_select(Tracker.pluck(:name), Setting.plugin_redmine_hire['issue_tracker']) %>
-      </td>
-    </tr>
+</p>
 
-    <tr>
-      <th>Issue Author Login</th>
-      <td>
-        <%= select_tag 'settings[issue_author]',
+<p>
+  <label for="settings[issue_author]">Issue Author Login</label>
+  <%= select_tag 'settings[issue_author]',
           options_for_select(User.pluck(:login), Setting.plugin_redmine_hire['issue_author']) %>
-      </td>
-    </tr>
+</p>
 
-    <tr>
-      <th>Redmine API Key</th>
-      <td>
-        <input
-          type="text"
-          id="settings_redmine_api_key"
-          value="<%= settings['redmine_api_key'] %>"
-          name="settings[redmine_api_key]"
-        >
-      </td>
-    </tr>
+<h3>Redmine data</h3>
+<p>
+  <label for="settings_redmine_api_key">Redmine API Key</label>
+  <input
+    type="text"
+    id="settings_redmine_api_key"
+    value="<%= settings['redmine_api_key'] %>"
+    name="settings[redmine_api_key]"
+  >
+  <span>You can get in the Redmine account settings</span>
+</p>
 
-    <% if Gem.loaded_specs.has_key?('sidekiq-cron') %>
-      <tr>
-        <th>HH Api Sync Cron</th>
-        <td>
-          <input
-            type="text"
-            id="settings_hh_api_sync_cron"
-            value="<%= settings['hh_api_sync_cron'] %>"
-            name="settings[hh_api_sync_cron]"
-          >
-        </td>
-      </tr>
-    <% end %>
+<% if Gem.loaded_specs.has_key?('sidekiq-cron') %>
 
-  </tbody>
-</table>
+  <h3>Sidekiq-cron schedule</h3>
+  <p>
+    <label for="settings_hh_api_sync_cron">HH Api Sync Cron</label>
+    <input
+      type="text"
+      id="settings_hh_api_sync_cron"
+      value="<%= settings['hh_api_sync_cron'] %>"
+      name="settings[hh_api_sync_cron]"
+    >
+    <span>Schedule for sync job</span>
+  </p>
+
+<% end %>
 
 <% if Gem.loaded_specs.has_key?('sidekiq-cron') %>
   <hr>
-  <%= link_to 'Инициировать cron расписание', '/redmine_hire/init_sidekiq_jobs' %>
-  <%= link_to 'Удалить cron расписание', '/redmine_hire/destroy_sidekiq_jobs' %>
+  <p><%= link_to 'Инициировать cron расписание', '/redmine_hire/init_sidekiq_jobs' %></p>
+  <p><%= link_to 'Удалить cron расписание', '/redmine_hire/destroy_sidekiq_jobs' %></p>
 <% end %>
