@@ -1,5 +1,5 @@
 class RefusalWorker
-  include Sidekiq::Worker
+  include Hh::Worker
 
   def perform(issue_id, refusal_url)
     issue = Issue.find(issue_id)

@@ -1,5 +1,5 @@
 class HhApiWorker
-  include Sidekiq::Worker
+  include Hh::Worker
 
   def perform(*args)
     Hh::ApiService.new.execute('active')
