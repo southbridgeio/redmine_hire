@@ -1,0 +1,16 @@
+ru:
+  redmine_hire:
+    settings:
+      hh_ru_title: Настройки API HH.ru
+      issue_settings: Настройки задач
+      access_token_description: Token и Employer ID можно получить <a href='https://dev.hh.ru/admin' target='_blank'>здесь</a>
+      project_name: Проект
+      issue_status_name: Статус задач
+      issue_tracker_name: Трекер
+      issue_author_name: Автор задач
+
+      sidekiq:
+        title: Расписание Sidekiq-Cron
+        schedule: Расписание Cron для синхронизации
+        init: Инициализировать Cron
+        delete: Удалить Cron

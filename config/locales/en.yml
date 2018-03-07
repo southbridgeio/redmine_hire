@@ -1,3 +1,16 @@
-# English strings go here for Rails i18n
 en:
-  # my_label: "My label"
+  redmine_hire:
+    settings:
+      hh_ru_title: HH.ru API settings
+      issue_settings: Issue settings
+      access_token_description: Token and Employer ID can be obtained <a href='https://dev.hh.ru/admin' target='_blank'>here</a>
+      project_name: Project Name
+      issue_status_name: Issue Status Name
+      issue_tracker_name: Issue Tracker Name
+      issue_author_name: Issue Author Name
+
+      sidekiq:
+        title: Sidekiq-Cron schedule
+        schedule: HH Api Cron schedule
+        init: Init Cron schedule
+        delete: Delete Cron schedule

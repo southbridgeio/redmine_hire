@@ -2,8 +2,8 @@
     <%= stylesheet_link_tag "redmine_hire.css", :plugin => "redmine_hire", :media => "screen" %>
 <% end %>
 
-<h3>hh.ru data</h3>
-<span>You can get in <%= link_to 'hh api', 'https://dev.hh.ru/admin' %></span>
+<h3><%= t('redmine_hire.settings.hh_ru_title') %></h3>
+<span><%= t('redmine_hire.settings.access_token_description').html_safe %></span>
 <p>
   <label class='required' for="settings_hh_access_token">HH Access Token</label>
   <input
@@ -24,27 +24,27 @@
   >
 </p>
 
-<h3>Issue attributes</h3>
+<h3><%= t('redmine_hire.settings.issue_settings') %></h3>
 <p>
-  <label class='required' for="settings[project_name]">Project Name</label>
+  <label class='required' for="settings[project_name]"><%= t('redmine_hire.settings.project_name') %></label>
   <%= select_tag 'settings[project_name]',
     options_for_select(Project.pluck(:name), Setting.plugin_redmine_hire['project_name']) %>
 </p>
 
 <p>
-  <label class='required' for="settings[issue_status]">Issue Status Name</label>
+  <label class='required' for="settings[issue_status]"><%= t('redmine_hire.settings.issue_status_name') %></label>
   <%= select_tag 'settings[issue_status]',
     options_for_select(IssueStatus.pluck(:name), Setting.plugin_redmine_hire['issue_status']) %>
 </p>
 
 <p>
-  <label class='required' for="settings[issue_tracker]">Issue Tracker Name</label>
+  <label class='required' for="settings[issue_tracker]"><%= t('redmine_hire.settings.issue_tracker_name') %></label>
   <%= select_tag 'settings[issue_tracker]',
     options_for_select(Tracker.pluck(:name), Setting.plugin_redmine_hire['issue_tracker']) %>
 </p>
 
 <p>
-  <label for="settings[issue_author]">Issue Author Name</label>
+  <label for="settings[issue_author]"><%= t('redmine_hire.settings.issue_author_name') %></label>
   <%= select_tag 'settings[issue_author]',
     options_for_select(User.all.map { |u| [u.name, u.id] }, Setting.plugin_redmine_hire['issue_author']) %>
 </p>
@@ -63,22 +63,21 @@
 
 <% if Gem.loaded_specs.has_key?('sidekiq-cron') %>
 
-  <h3>Sidekiq-cron schedule</h3>
+  <h3><%= t('redmine_hire.settings.sidekiq.title') %></h3>
   <p>
-    <label for="settings_hh_api_sync_cron">HH Api Sync Cron</label>
+    <label for="settings_hh_api_sync_cron"><%= t('redmine_hire.settings.sidekiq.schedule') %></label>
     <input
       type="text"
       id="settings_hh_api_sync_cron"
       value="<%= settings['hh_api_sync_cron'] %>"
       name="settings[hh_api_sync_cron]"
     >
-    <span>Schedule for sync job</span>
   </p>
 
 <% end %>
 
 <% if Gem.loaded_specs.has_key?('sidekiq-cron') %>
   <hr>
-  <p><%= link_to 'Инициировать cron расписание', '/redmine_hire/init_sidekiq_jobs' %></p>
-  <p><%= link_to 'Удалить cron расписание', '/redmine_hire/destroy_sidekiq_jobs' %></p>
+  <p><%= link_to t('redmine_hire.settings.sidekiq.init'), '/redmine_hire/init_sidekiq_jobs' %></p>
+  <p><%= link_to t('redmine_hire.settings.sidekiq.delete'), '/redmine_hire/destroy_sidekiq_jobs' %></p>
 <% end %>
