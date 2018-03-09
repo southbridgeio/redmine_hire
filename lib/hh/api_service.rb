@@ -3,9 +3,6 @@ require 'uri'
 
 module Hh
   class ApiService
-
-    ACCESS_TOKEN = Setting.plugin_redmine_hire['hh_access_token']
-    EMPLOYER_ID =  Setting.plugin_redmine_hire['hh_employer_id']
     USER_AGENT = 'Redmine/redmine_hire_plugin'
     BASE_URL = 'https://api.hh.ru'
 
@@ -73,7 +70,7 @@ module Hh
       http.use_ssl = true
       header = {
         "Content-Type" => "application/json",
-        "Authorization" => "Bearer #{ACCESS_TOKEN}",
+        "Authorization" => "Bearer #{access_token}",
         "User-Agent" => USER_AGENT
       }
       request = Net::HTTP::Get.new(uri.request_uri, header)
@@ -93,7 +90,7 @@ module Hh
       http.use_ssl = true
       header = {
         "Content-Type" => "application/json",
-        "Authorization" => "Bearer #{ACCESS_TOKEN}",
+        "Authorization" => "Bearer #{access_token}",
         "User-Agent" => USER_AGENT
       }
       request = Net::HTTP::Post.new(uri.request_uri, header)
@@ -101,6 +98,14 @@ module Hh
     end
 
     private
+
+    def access_token
+      Setting.plugin_redmine_hire['hh_access_token']
+    end
+
+    def employer_id
+      Setting.plugin_redmine_hire['hh_employer_id']
+    end
 
     def vacancy_save(vacancy)
       vacancy = HhVacancy.find_or_create_by!(hh_id: vacancy['id'])
@@ -122,13 +127,13 @@ module Hh
 
     # GET /employers/{employer_id}/vacancies/active // получаем все активные вакансии
     def get_active_vacancies
-      api_response = api_get("#{BASE_URL}/employers/#{EMPLOYER_ID}/vacancies/active")
+      api_response = api_get("#{BASE_URL}/employers/#{employer_id}/vacancies/active")
       return api_response['items']
     end
 
     # GET /employers/{employer_id}/vacancies/archived // получаем все архивные вакансии
     def get_archived_vacancies
-      api_response = api_get("#{BASE_URL}/employers/#{EMPLOYER_ID}/vacancies/archived")
+      api_response = api_get("#{BASE_URL}/employers/#{employer_id}/vacancies/archived")
       return api_response['items']
     end
 
