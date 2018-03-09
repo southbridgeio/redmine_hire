@@ -3,13 +3,6 @@ require 'uri'
 
 module Hh
   class IssueBuilder
-
-    PROJECT_NAME = Setting.plugin_redmine_hire['project_name']
-    ISSUE_STATUS_NAME = Setting.plugin_redmine_hire['issue_status']
-    ISSUE_TRACKER_NAME = Setting.plugin_redmine_hire['issue_tracker']
-    ISSUE_AUTHOR = Setting.plugin_redmine_hire['issue_author']
-    REDMINE_API_KEY = Setting.plugin_redmine_hire['redmine_api_key']
-
     attr_reader :api_data
 
     def initialize(api_data)
@@ -18,8 +11,8 @@ module Hh
 
     def execute
       return if Issue.where(vacancy_id: api_data[:vacancy_id], resume_id: api_data[:resume_id]).present?
-      new_issue_status = IssueStatus.find_or_create_by!(name: ISSUE_STATUS_NAME)
-      new_issue_author = User.find_by(id: ISSUE_AUTHOR) || User.find_by(status: User::STATUS_ANONYMOUS)
+      new_issue_status = IssueStatus.find_or_create_by!(name: issue_status_name)
+      new_issue_author = User.find_by(id: issue_author) || User.find_by(status: User::STATUS_ANONYMOUS)
       if helpdesk_present?
         response = helpdesk_api_post
         raise "Helpdesk API Error" unless response.code.start_with?('2')
@@ -40,6 +33,22 @@ module Hh
 
     private
 
+    def project_name
+      Setting.plugin_redmine_hire['project_name']
+    end
+
+    def issue_status_name
+      Setting.plugin_redmine_hire['issue_status']
+    end
+
+    def issue_tracker_name
+      Setting.plugin_redmine_hire['issue_tracker']
+    end
+
+    def issue_author
+      Setting.plugin_redmine_hire['issue_author']
+    end
+
     def helpdesk_api_post
       uri = URI.parse "#{Setting['protocol']}://#{Setting['host_name']}/helpdesk/create_ticket.xml"
       request = Net::HTTP::Post.new uri.path
@@ -57,9 +66,9 @@ module Hh
       xm.instruct!
       xm.ticket {
         xm.issue {
-          xm.project_id(Project.find_or_create_by!(name: PROJECT_NAME).id)
+          xm.project_id(Project.find_or_create_by!(name: project_name).id)
           xm.subject(build_subject)
-          xm.tracker_id(Tracker.find_or_create_by!(name: ISSUE_TRACKER_NAME).id)
+          xm.tracker_id(Tracker.find_or_create_by!(name: issue_tracker_name).id)
           xm.description(build_comment)
         }
         xm.contact {
@@ -77,9 +86,9 @@ module Hh
       request['X-Redmine-API-Key'] = REDMINE_API_KEY
       request.body = {
         issue: {
-          project_id: Project.find_or_create_by!(name: PROJECT_NAME).id,
+          project_id: Project.find_or_create_by!(name: project_name).id,
           subject: build_subject,
-          tracker_id: Tracker.find_or_create_by!(name: ISSUE_TRACKER_NAME).id,
+          tracker_id: Tracker.find_or_create_by!(name: issue_tracker_name).id,
           description: build_comment,
         }
       }.to_json
