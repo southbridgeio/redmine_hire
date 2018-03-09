@@ -3,12 +3,6 @@ require 'uri'
 
 module Hh
   class IssueBuilder
-
-    PROJECT_NAME = Setting.plugin_redmine_hire['project_name']
-    ISSUE_STATUS_NAME = Setting.plugin_redmine_hire['issue_status']
-    ISSUE_TRACKER_NAME = Setting.plugin_redmine_hire['issue_tracker']
-    ISSUE_AUTHOR = Setting.plugin_redmine_hire['issue_author']
-
     attr_reader :api_data
 
     def initialize(api_data)
@@ -17,13 +11,13 @@ module Hh
 
     def execute
       return if Issue.where(vacancy_id: api_data[:vacancy_id], resume_id: api_data[:resume_id]).present?
-      new_issue_status = IssueStatus.find_or_create_by!(name: ISSUE_STATUS_NAME)
-      new_issue_author = User.find_by(id: ISSUE_AUTHOR) || User.find_by(status: User::STATUS_ANONYMOUS)
+      new_issue_status = IssueStatus.find_or_create_by!(name: issue_status_name)
+      new_issue_author = User.find_by(id: issue_author) || User.find_by(status: User::STATUS_ANONYMOUS)
 
       issue = Issue.create!(
-        project_id: Project.find_or_create_by!(name: PROJECT_NAME).id,
+        project_id: Project.find_or_create_by!(name: project_name).id,
         subject: build_subject,
-        tracker_id: Tracker.find_or_create_by!(name: ISSUE_TRACKER_NAME).id,
+        tracker_id: Tracker.find_or_create_by!(name: issue_tracker_name).id,
         description: build_comment,
         vacancy_id: api_data[:vacancy_id],
         resume_id: api_data[:resume_id],
@@ -48,6 +42,22 @@ module Hh
     end
 
     private
+
+    def project_name
+      Setting.plugin_redmine_hire['project_name']
+    end
+
+    def issue_status_name
+      Setting.plugin_redmine_hire['issue_status']
+    end
+
+    def issue_tracker_name
+      Setting.plugin_redmine_hire['issue_tracker']
+    end
+
+    def issue_author
+      Setting.plugin_redmine_hire['issue_author']
+    end
 
     def build_comment
       previous_issues_ids = Issue.where(resume_id: api_data[:resume_id]).pluck(:id)
