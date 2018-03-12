@@ -46,6 +46,11 @@ class HhIssueBuilderTest < ActiveSupport::TestCase
 
       setup do
         Hh::IssueBuilder.any_instance.stubs(:helpdesk_present?).returns(true)
+
+        class HelpdeskTicket
+        end
+
+        HelpdeskTicket.stubs(:create!)
       end
 
       should 'assign issue attributes' do
