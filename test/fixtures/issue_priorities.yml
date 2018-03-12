@@ -1,0 +1,5 @@
+issue_priority_1:
+  id: 1
+  type: 'IssuePriority'
+  name: 'Нормальный'
+  position_name: 'default'

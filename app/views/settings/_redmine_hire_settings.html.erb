@@ -49,18 +49,6 @@
     options_for_select(User.all.map { |u| [u.name, u.id] }, Setting.plugin_redmine_hire['issue_author']) %>
 </p>
 
-<h3>Redmine data</h3>
-<p>
-  <label class='required' for="settings_redmine_api_key">Redmine API Key</label>
-  <input
-    type="text"
-    id="settings_redmine_api_key"
-    value="<%= settings['redmine_api_key'] %>"
-    name="settings[redmine_api_key]"
-  >
-  <span>You can get in the Redmine account settings</span>
-</p>
-
 <% if Gem.loaded_specs.has_key?('sidekiq-cron') %>
 
   <h3><%= t('redmine_hire.settings.sidekiq.title') %></h3>
