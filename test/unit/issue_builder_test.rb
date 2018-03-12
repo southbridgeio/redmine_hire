@@ -33,14 +33,11 @@ class HhIssueBuilderTest < ActiveSupport::TestCase
       }
 
       Setting.stubs(:plugin_redmine_hire).returns(
-        'project_name' => 'test',
-        'issue_status' => 'test',
-        'issue_tracker' => 'test',
-        'issue_author' => 1
+        'project_name' => 'Работа',
+        'issue_status' => 'Новая',
+        'issue_tracker' => 'Основной',
+        'issue_author' => @user.id
       )
-
-      Tracker.create!(name: 'test', default_status: IssueStatus.create!(name: 'test'))
-      Project.create!(name: 'test', identifier: 'test')
     end
 
     subject { Hh::IssueBuilder.new(@params).execute }
@@ -51,19 +48,9 @@ class HhIssueBuilderTest < ActiveSupport::TestCase
         Hh::IssueBuilder.any_instance.stubs(:helpdesk_present?).returns(true)
       end
 
-      should 'raise error if helpdesk_api_post fail' do
-        stub_request(:post, "#{Setting['protocol']}://#{Setting['host_name']}/helpdesk/create_ticket.xml")
-          .to_return body: "", status: '401'
-
-        assert_raises(Exception) { subject }
-      end
-
       should 'assign issue attributes' do
-        stub_request(:post, "#{Setting['protocol']}://#{Setting['host_name']}/helpdesk/create_ticket.xml")
-          .to_return body: "Issue 2 created", status: '201'
-
         subject
-        issue = Issue.find(2)
+        issue = Issue.last
         status = IssueStatus.find(1)
 
         assert_equal @params[:vacancy_id].to_i, issue.vacancy_id
@@ -81,19 +68,9 @@ class HhIssueBuilderTest < ActiveSupport::TestCase
         Hh::IssueBuilder.any_instance.stubs(:helpdesk_present?).returns(false)
       end
 
-      should 'raise error if redmine_api_post fail' do
-        stub_request(:post, "#{Setting['protocol']}://#{Setting['host_name']}/issues.json")
-          .to_return body: "", status: '401'
-
-        assert_raises(Exception) { subject }
-      end
-
       should 'assign issue attributes' do
-        stub_request(:post, "#{Setting['protocol']}://#{Setting['host_name']}/issues.json")
-          .to_return body: "{\"issue\":{\"id\":2}}", status: '201'
-
         subject
-        issue = Issue.find(2)
+        issue = Issue.last
         status = IssueStatus.find(1)
 
         assert_equal @params[:vacancy_id].to_i, issue.vacancy_id

@@ -36,8 +36,6 @@ module Hh
           next
         end
       end
-    rescue => e
-      logger.error e.to_s
     end
 
     def rollback! # for debug process
@@ -59,9 +57,6 @@ module Hh
       else
         RefusalWorker.new.perform(issue_id, refusal_url)
       end
-
-    rescue => e
-      logger.error e.to_s
     end
 
     def api_get(url)

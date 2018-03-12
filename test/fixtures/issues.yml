@@ -1,6 +1,6 @@
 issue_1:
   id: 111
-  tracker_id: 1
+  tracker: tracker_1
   project_id: 1
   subject: "MyTestIssue"
   description: "MyDescription"
@@ -11,7 +11,7 @@ issue_1:
 
 issue_2:
   id: 2
-  tracker_id: 1
+  tracker: tracker_1
   project_id: 1
   subject: "MyTestIssue"
   description: "MyDescription"

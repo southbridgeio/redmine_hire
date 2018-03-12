@@ -14,30 +14,31 @@ module Hh
       new_issue_status = IssueStatus.find_or_create_by!(name: issue_status_name)
       new_issue_author = User.find_by(id: issue_author) || User.find_by(status: User::STATUS_ANONYMOUS)
 
-      issue = Issue.create!(
-        project_id: Project.find_or_create_by!(name: project_name).id,
-        subject: build_subject,
-        tracker_id: Tracker.find_or_create_by!(name: issue_tracker_name).id,
-        description: build_comment,
-        vacancy_id: api_data[:vacancy_id],
-        resume_id: api_data[:resume_id],
-        status_id: new_issue_status&.id,
-        author_id: new_issue_author&.id,
-        hh_response_id: api_data[:hh_response_id]
-      )
-
-      if helpdesk_present?
-        HelpdeskTicket.create!(
-          issue: issue,
-          customer: Contact.create!(
-            email: api_data[:applicant_email],
-            first_name: api_data[:applicant_first_name],
-            last_name: api_data[:applicant_last_name]
-          )
+      Issue.transaction do
+        issue = Issue.create!(
+          priority: IssuePriority.find_by!(position_name: 'default'),
+          project_id: Project.find_or_create_by!(name: project_name).id,
+          subject: build_subject,
+          tracker_id: Tracker.find_or_create_by!(name: issue_tracker_name).id,
+          description: build_comment,
+          vacancy_id: api_data[:vacancy_id],
+          resume_id: api_data[:resume_id],
+          status_id: new_issue_status.id,
+          author_id: new_issue_author.id,
+          hh_response_id: api_data[:hh_response_id]
         )
-        response = helpdesk_api_post
-        raise "Helpdesk API Error" unless response.code.start_with?('2')
-        new_issue_id = response.body.gsub(/[^\d]/, '')
+
+        if helpdesk_present?
+          HelpdeskTicket.create!(
+            issue: issue,
+            customer: Contact.create!(
+              project: issue.project,
+              email: api_data[:applicant_email],
+              first_name: api_data[:applicant_first_name],
+              last_name: api_data[:applicant_last_name]
+            )
+          )
+        end
       end
     end
 
