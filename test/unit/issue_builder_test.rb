@@ -11,11 +11,6 @@ class HhIssueBuilderTest < ActiveSupport::TestCase
       @user.email_address.address = 'test@mail.ru'
       @user.save
 
-      Hh::IssueBuilder.const_set(:PROJECT_NAME, 'Работа')
-      Hh::IssueBuilder.const_set(:ISSUE_STATUS_NAME, 'Новая')
-      Hh::IssueBuilder.const_set(:ISSUE_TRACKER_NAME, 'Основной')
-      Hh::IssueBuilder.const_set(:ISSUE_AUTHOR, @user.id)
-
       @params = {
         vacancy_id: "22242092",
         resume_id: "f88757a00003fb4920001236f26d6f676b4630",
@@ -38,7 +33,15 @@ class HhIssueBuilderTest < ActiveSupport::TestCase
       }
     end
 
-    subject { Hh::IssueBuilder.new(@params).execute }
+    subject do
+      Setting.stub(:plugin_redmine_hire,
+        'project_name' => 'test',
+        'issue_status' => 1,
+        'issue_tracker' => 'test',
+        'issue_author' => 'issue author') do
+        Hh::IssueBuilder.new(@params).execute
+      end
+    end
 
     context 'when Helpdesk present' do
 
