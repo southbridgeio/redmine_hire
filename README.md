@@ -1,4 +1,6 @@
-## redmine_hire
+[![Build Status](https://travis-ci.org/centosadmin/redmine_hire.svg?branch=master)](https://travis-ci.org/centosadmin/redmine_hire)
+
+# redmine_hire
 
 The plugin works only with Russian website hh.ru, and does not support other services.
 
