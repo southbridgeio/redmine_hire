@@ -1,4 +1,5 @@
 project_1:
   id: 1
+  trackers: [tracker_1]
   name: 'Работа'
-
+  identifier: 'work'

@@ -9,12 +9,7 @@ class HhIssueBuilderTest < ActiveSupport::TestCase
       @user = User.new(login: 'redmine_hire', firstname: 'Name', lastname: 'Lastname')
       @user.validate
       @user.email_address.address = 'test@mail.ru'
-      @user.save
-
-      Hh::IssueBuilder.const_set(:PROJECT_NAME, 'Работа')
-      Hh::IssueBuilder.const_set(:ISSUE_STATUS_NAME, 'Новая')
-      Hh::IssueBuilder.const_set(:ISSUE_TRACKER_NAME, 'Основной')
-      Hh::IssueBuilder.const_set(:ISSUE_AUTHOR, @user.id)
+      @user.save!
 
       @params = {
         vacancy_id: "22242092",
@@ -36,39 +31,36 @@ class HhIssueBuilderTest < ActiveSupport::TestCase
         description: "• Поддержка программно-аппаратных комплексов различного уровня сложности (развертывание, настройка, обновление, обслуживание, резервное копирование и т.п.)\r\n• Опыт внедрения программно-аппаратных комплексов.\r\n• Разработка и проектирование баз данных (SQL) и программных комплексов. Анализ, проектирование, составление технического задания, разработка, внедрение.\r\n• Быстрое обучение требуемому языку программирования.\r\n• Поддержка виртуальной инфраструктуры (проектирование, развертывание, настройка, поддержка и т.п.).",
         cover_letter: "Готов работать удаленно"
       }
+
+      Setting.stubs(:plugin_redmine_hire).returns(
+        'project_name' => 'Работа',
+        'issue_status' => 'Новая',
+        'issue_tracker' => 'Основной',
+        'issue_author' => @user.id
+      )
     end
 
     subject { Hh::IssueBuilder.new(@params).execute }
 
-    context 'when Helpdesk present' do
+    # context 'when Helpdesk present' do
 
-      setup do
-        Hh::IssueBuilder.any_instance.stubs(:helpdesk_present?).returns(true)
-      end
+    #   setup do
+    #     Hh::IssueBuilder.any_instance.stubs(:helpdesk_present?).returns(true)
+    #   end
 
-      should 'raise error if helpdesk_api_post fail' do
-        stub_request(:post, "#{Setting['protocol']}://#{Setting['host_name']}/helpdesk/create_ticket.xml")
-          .to_return body: "", status: '401'
+    #   should 'assign issue attributes' do
+    #     subject
+    #     issue = Issue.last
+    #     status = IssueStatus.find(1)
 
-        assert_raises(Exception) { subject }
-      end
+    #     assert_equal @params[:vacancy_id].to_i, issue.vacancy_id
+    #     assert_equal @params[:resume_id], issue.resume_id
+    #     assert_equal status.id, issue.status_id
+    #     assert_equal @user.id, issue.author_id
+    #     assert_equal @params[:hh_response_id].to_i, issue.hh_response_id
+    #   end
 
-      should 'assign issue attributes' do
-        stub_request(:post, "#{Setting['protocol']}://#{Setting['host_name']}/helpdesk/create_ticket.xml")
-          .to_return body: "Issue 2 created", status: '201'
-
-        subject
-        issue = Issue.find(2)
-        status = IssueStatus.find(1)
-
-        assert_equal @params[:vacancy_id].to_i, issue.vacancy_id
-        assert_equal @params[:resume_id], issue.resume_id
-        assert_equal status.id, issue.status_id
-        assert_equal @user.id, issue.author_id
-        assert_equal @params[:hh_response_id].to_i, issue.hh_response_id
-      end
-
-    end
+    # end
 
     context 'when Helpdesk not present' do
 
@@ -76,19 +68,9 @@ class HhIssueBuilderTest < ActiveSupport::TestCase
         Hh::IssueBuilder.any_instance.stubs(:helpdesk_present?).returns(false)
       end
 
-      should 'raise error if redmine_api_post fail' do
-        stub_request(:post, "#{Setting['protocol']}://#{Setting['host_name']}/issues.json")
-          .to_return body: "", status: '401'
-
-        assert_raises(Exception) { subject }
-      end
-
       should 'assign issue attributes' do
-        stub_request(:post, "#{Setting['protocol']}://#{Setting['host_name']}/issues.json")
-          .to_return body: "{\"issue\":{\"id\":2}}", status: '201'
-
         subject
-        issue = Issue.find(2)
+        issue = Issue.last
         status = IssueStatus.find(1)
 
         assert_equal @params[:vacancy_id].to_i, issue.vacancy_id
