@@ -9,7 +9,7 @@ class HhIssueBuilderTest < ActiveSupport::TestCase
       @user = User.new(login: 'redmine_hire', firstname: 'Name', lastname: 'Lastname')
       @user.validate
       @user.email_address.address = 'test@mail.ru'
-      @user.save
+      @user.save!
 
       @params = {
         vacancy_id: "22242092",
