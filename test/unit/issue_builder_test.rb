@@ -34,14 +34,13 @@ class HhIssueBuilderTest < ActiveSupport::TestCase
 
       Setting.stubs(:plugin_redmine_hire).returns(
         'project_name' => 'test',
-        'issue_status' => 1,
+        'issue_status' => 'test',
         'issue_tracker' => 'test',
-        'issue_author' => 'issue author'
+        'issue_author' => 1
       )
 
-
-      Tracker.create!(name: 'test')
-      Project.create!(name: 'test', identifier: 'test', default_status_id: 1)
+      Tracker.create!(name: 'test', default_status: IssueStatus.create!(name: 'test'))
+      Project.create!(name: 'test', identifier: 'test')
     end
 
     subject { Hh::IssueBuilder.new(@params).execute }
