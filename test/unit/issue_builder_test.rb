@@ -41,7 +41,7 @@ class HhIssueBuilderTest < ActiveSupport::TestCase
 
 
       Tracker.create!(name: 'test')
-      Project.create!(name: 'test', identifier: 'test')
+      Project.create!(name: 'test', identifier: 'test', default_status_id: 1)
     end
 
     subject { Hh::IssueBuilder.new(@params).execute }
