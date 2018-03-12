@@ -41,8 +41,6 @@ mv $TESTSPACE/database.yml.travis config/database.yml
 # create a link to the backlogs plugin
 ln -sf $PATH_TO_PLUGIN plugins/$NAME_OF_PLUGIN
 
-git clone git@github.com:RCRM/redmine_contacts.git $PATH_TO_REDMINE/plugins/redmine_contacts
-
 # install gems
 bundle install
 
