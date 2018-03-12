@@ -39,6 +39,8 @@ class HhIssueBuilderTest < ActiveSupport::TestCase
         'issue_author' => 'issue author'
       )
 
+
+      Tracker.create!(name: 'test')
       Project.create!(name: 'test', identifier: 'test')
     end
 
