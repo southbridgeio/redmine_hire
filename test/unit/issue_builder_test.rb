@@ -42,30 +42,25 @@ class HhIssueBuilderTest < ActiveSupport::TestCase
 
     subject { Hh::IssueBuilder.new(@params).execute }
 
-    context 'when Helpdesk present' do
+    # context 'when Helpdesk present' do
 
-      setup do
-        Hh::IssueBuilder.any_instance.stubs(:helpdesk_present?).returns(true)
+    #   setup do
+    #     Hh::IssueBuilder.any_instance.stubs(:helpdesk_present?).returns(true)
+    #   end
 
-        class HelpdeskTicket
-        end
+    #   should 'assign issue attributes' do
+    #     subject
+    #     issue = Issue.last
+    #     status = IssueStatus.find(1)
 
-        HelpdeskTicket.stubs(:create!)
-      end
+    #     assert_equal @params[:vacancy_id].to_i, issue.vacancy_id
+    #     assert_equal @params[:resume_id], issue.resume_id
+    #     assert_equal status.id, issue.status_id
+    #     assert_equal @user.id, issue.author_id
+    #     assert_equal @params[:hh_response_id].to_i, issue.hh_response_id
+    #   end
 
-      should 'assign issue attributes' do
-        subject
-        issue = Issue.last
-        status = IssueStatus.find(1)
-
-        assert_equal @params[:vacancy_id].to_i, issue.vacancy_id
-        assert_equal @params[:resume_id], issue.resume_id
-        assert_equal status.id, issue.status_id
-        assert_equal @user.id, issue.author_id
-        assert_equal @params[:hh_response_id].to_i, issue.hh_response_id
-      end
-
-    end
+    # end
 
     context 'when Helpdesk not present' do
 
