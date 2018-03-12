@@ -31,17 +31,16 @@ class HhIssueBuilderTest < ActiveSupport::TestCase
         description: "• Поддержка программно-аппаратных комплексов различного уровня сложности (развертывание, настройка, обновление, обслуживание, резервное копирование и т.п.)\r\n• Опыт внедрения программно-аппаратных комплексов.\r\n• Разработка и проектирование баз данных (SQL) и программных комплексов. Анализ, проектирование, составление технического задания, разработка, внедрение.\r\n• Быстрое обучение требуемому языку программирования.\r\n• Поддержка виртуальной инфраструктуры (проектирование, развертывание, настройка, поддержка и т.п.).",
         cover_letter: "Готов работать удаленно"
       }
-    end
 
-    subject do
-      Setting.stub(:plugin_redmine_hire,
+      Setting.stubs(:plugin_redmine_hire).returns(
         'project_name' => 'test',
         'issue_status' => 1,
         'issue_tracker' => 'test',
-        'issue_author' => 'issue author') do
-        Hh::IssueBuilder.new(@params).execute
-      end
+        'issue_author' => 'issue author'
+      )
     end
+
+    subject { Hh::IssueBuilder.new(@params).execute }
 
     context 'when Helpdesk present' do
 
