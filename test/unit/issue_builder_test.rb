@@ -38,6 +38,8 @@ class HhIssueBuilderTest < ActiveSupport::TestCase
         'issue_tracker' => 'test',
         'issue_author' => 'issue author'
       )
+
+      Project.create!(name: 'test', identifier: 'test')
     end
 
     subject { Hh::IssueBuilder.new(@params).execute }
