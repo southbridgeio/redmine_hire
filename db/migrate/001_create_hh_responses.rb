@@ -4,5 +4,6 @@ class CreateHhResponses < ActiveRecord::Migration
       t.bigint :hh_id, index: true
       t.string :refusal_url
     end
+
   end
 end
