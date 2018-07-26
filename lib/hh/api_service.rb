@@ -89,13 +89,13 @@ module Hh
         "User-Agent" => USER_AGENT
       }
       request = Net::HTTP::Post.new(uri.request_uri, header)
-      response = http.request(request)
+      http.request(request)
     end
 
     private
 
     def access_token
-      Setting.plugin_redmine_hire['hh_access_token']
+      Setting.plugin_redmine_hire['access_token']
     end
 
     def employer_id

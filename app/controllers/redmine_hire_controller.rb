@@ -24,4 +24,13 @@ class RedmineHireController < ApplicationController
     Sidekiq::Cron::Job.destroy 'hh_api_sync_responses'
     redirect_to '/settings/plugin/redmine_hire'
   end
+
+  def oauth
+    if Hh::OAuth.fetch_tokens(params[:code])
+      flash[:notice] = I18n.t('redmine_hire.settings.auth_success')
+      redirect_to controller: 'settings', action: 'plugin', id: 'redmine_hire'
+    else
+      render_403(message: I18n.t('redmine_hire.settings.auth_fail'))
+    end
+  end
 end
