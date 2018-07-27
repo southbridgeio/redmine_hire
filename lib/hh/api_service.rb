@@ -3,6 +3,16 @@ require 'uri'
 
 module Hh
   class ApiService
+    class RequestError < StandardError
+      attr_reader :code, :errors
+
+      def initialize(code:, errors:)
+        @code = code
+        @errors = errors
+        super("Error code: #{code} #{errors.map { |e| "#{e['type']}: #{e['value']}" }.join("\n")}")
+      end
+    end
+
     USER_AGENT = 'Redmine/redmine_hire_plugin'
     BASE_URL = 'https://api.hh.ru'
 
@@ -13,29 +23,33 @@ module Hh
       vacancies = send("get_#{vacancies_status}_vacancies")
       vacancies.each do |vacancy|
         begin
-          vacancy_save(vacancy)
+          ActiveRecord::Base.transaction do
+            vacancy_save(vacancy)
 
-          vacancy_responses = get_vacancy_responses(vacancy['id'])
+            vacancy_responses = get_vacancy_responses(vacancy['id'])
 
-          vacancy_responses.each do |hh_response|
-            next if hh_response_present?(hh_response['id'].to_i)
-            hh_response_save(hh_response)
+            vacancy_responses.each do |hh_response|
+              next if hh_response_present?(hh_response['id'].to_i)
+              hh_response_save(hh_response)
 
-            raise "Resume empty" if hh_response['resume'].blank?
+              raise "Resume empty" if hh_response['resume'].blank?
 
-            resume = api_get(hh_response['resume']['url'])
-            applicant_save(resume)
+              resume = api_get(hh_response['resume']['url'])
+              applicant_save(resume)
 
-            cover_letter = get_cover_letter(hh_response['messages_url'])
+              cover_letter = get_cover_letter(hh_response['messages_url'])
 
-            IssueBuilder.new(api_data(vacancy, resume, cover_letter, hh_response['id'])).execute
+              IssueBuilder.new(api_data(vacancy, resume, cover_letter, hh_response['id'])).execute
+            end
           end
-        rescue => e
+        rescue RequestError => e
           logger.error e.to_s
           logger.error e.backtrace.join("\n")
-          next
         end
       end
+    rescue RequestError => e
+      logger.error e.to_s
+      logger.error e.backtrace.join("\n")
     end
 
     def rollback! # for debug process
@@ -60,23 +74,23 @@ module Hh
     end
 
     def api_get(url)
-      uri = URI.parse(url)
-      http = Net::HTTP.new(uri.host, uri.port)
-      http.use_ssl = true
+      tries ||= 3
       header = {
-        "Content-Type" => "application/json",
-        "Authorization" => "Bearer #{access_token}",
-        "User-Agent" => USER_AGENT
+        content_type: "application/json",
+        authorization: "Bearer #{access_token}",
+        user_agent: USER_AGENT
       }
-      request = Net::HTTP::Get.new(uri.request_uri, header)
-      response = http.request(request)
-      response_body = JSON.parse(response.body)
-
-      if response.code != '200'
-        errors = response_body['errors'].map { |e| "#{e['type']}: #{e['value']}" }.join(', ')
-        raise "HH API Error: #{errors}"
+      RestClient.get(url, header) do |response, _, _|
+        result = JSON.parse(response.body)
+        raise RequestError.new(code: response.code, errors: result['errors']) if response.code != 200
+        result
       end
-      response_body
+    rescue RequestError => e
+      if e.code == 403 && e.errors.any? { |error| error['type'] == 'oauth' && error['value'] == 'token_expired' } && (tries -= 1).zero?
+        logger.info('Tokens expired. Trying to reissue...')
+        Hh::OAuth.reissue_tokens && retry
+      end
+      raise
     end
 
     def api_post(url)
@@ -176,7 +190,8 @@ module Hh
     end
 
     def logger
-      @logger ||= Logger.new(Rails.root.join('log', 'redmine_hire.log'))
+      out = Rails.env.production? ? Rails.root.join('log', 'redmine_hire.log') : STDOUT
+      @logger ||= Logger.new(out)
     end
 
     # Пока не используем коллекции откликов, т.к. все наши отклики в колекции 'response'.
