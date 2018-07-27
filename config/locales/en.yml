@@ -8,6 +8,9 @@ en:
       issue_status_name: Issue Status Name
       issue_tracker_name: Issue Tracker Name
       issue_author_name: Issue Author Name
+      auth: Authorize app
+      auth_success: Successfully authorized
+      auth_fail: Authorization failed
 
       sidekiq:
         title: Sidekiq-Cron schedule
