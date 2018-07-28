@@ -86,7 +86,7 @@ module Hh
         result
       end
     rescue RequestError => e
-      if e.code == 403 && e.errors.any? { |error| error['type'] == 'oauth' && error['value'] == 'token_expired' } && (tries -= 1).zero?
+      if e.code == 403 && e.errors.any? { |error| error['type'] == 'oauth' && error['value'] == 'token_expired' } && !(tries -= 1).zero?
         logger.info('Tokens expired. Trying to reissue...')
         Hh::OAuth.reissue_tokens && retry
       end
