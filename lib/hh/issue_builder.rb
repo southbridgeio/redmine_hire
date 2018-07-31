@@ -38,6 +38,7 @@ module Hh
           contact.save!
 
           HelpdeskTicket.create!(
+            from_address: api_data[:applicant_email],
             issue: issue,
             customer: contact
           )
