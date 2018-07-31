@@ -123,8 +123,8 @@ module Hh
 
     def hh_response_save(hh_response)
       refusal_url = hh_response['actions']
-        .find { |e| e['name'] == 'Отказ' }&['templates']
-        .find { |e| e['name'] == "Шаблон быстрого отказа на отклик" }&['url'] || nil
+        &.find { |e| e['name'] == 'Отказ' }['templates']
+        &.find { |e| e['name'] == "Шаблон быстрого отказа на отклик" }&.[]('url') || nil
 
       HhResponse.create!(hh_id: hh_response['id'], refusal_url: refusal_url)
     end
