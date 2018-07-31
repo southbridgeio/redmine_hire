@@ -29,14 +29,17 @@ module Hh
         )
 
         if helpdesk_present?
+          contact = Contact.find_or_initialize_by(email: api_data[:applicant_email])
+          contact.assign_attributes(
+            project: issue.project,
+            first_name: api_data[:applicant_first_name],
+            last_name: api_data[:applicant_last_name]
+          )
+          contact.save!
+
           HelpdeskTicket.create!(
             issue: issue,
-            customer: Contact.create!(
-              project: issue.project,
-              email: api_data[:applicant_email],
-              first_name: api_data[:applicant_first_name],
-              last_name: api_data[:applicant_last_name]
-            )
+            customer: contact
           )
         end
       end
