@@ -16,12 +16,14 @@ Redmine::Plugin.register :redmine_hire do
   author_url 'https://github.com/centosadmin'
 
   settings :default => {
-    'hh_access_token' => '',
-    'hh_employer_id' => '',
+    'client_id' => '',
+    'client_secret' => '',
     'project_name' => '',
     'issue_status' => '',
     'issue_tracker' => '',
     'issue_author' => '',
-    'hh_api_sync_cron' => ''
+    'hh_api_sync_cron' => '',
+    'access_token' => '',
+    'refresh_token' => ''
   }, :partial => 'settings/redmine_hire_settings'
 end

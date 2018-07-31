@@ -85,3 +85,6 @@
   <p><%= link_to t('redmine_hire.settings.sidekiq.init'), '/redmine_hire/init_sidekiq_jobs' %></p>
   <p><%= link_to t('redmine_hire.settings.sidekiq.delete'), '/redmine_hire/destroy_sidekiq_jobs' %></p>
 <% end %>
+
+<%= hidden_field_tag 'settings[access_token]', @settings['access_token'] %>
+<%= hidden_field_tag 'settings[refresh_token]', @settings['refresh_token'] %>
