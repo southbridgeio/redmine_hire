@@ -3,16 +3,6 @@
 <% end %>
 
 <h3><%= t('redmine_hire.settings.hh_ru_title') %></h3>
-<span><%= t('redmine_hire.settings.access_token_description').html_safe %></span>
-<p>
-  <label class='required' for="settings_hh_access_token">HH Access Token</label>
-  <input
-    type="text"
-    id="settings_hh_access_token"
-    value="<%= settings['hh_access_token'] %>"
-    name="settings[hh_access_token]"
-  >
-</p>
 
 <p>
   <label class='required' for="settings_hh_access_token">HH Employer ID</label>
@@ -23,6 +13,32 @@
     name="settings[hh_employer_id]"
   >
 </p>
+
+<p>
+  <label class='required' for="settings_client_id">Client ID</label>
+  <input
+    type="text"
+    id="settings_client_id"
+    value="<%= settings['client_id'] %>"
+    name="settings[client_id]"
+  >
+</p>
+
+<p>
+  <label class='required' for="settings_client_secret">Client Secret</label>
+  <input
+    type="text"
+    id="settings_client_secret"
+    value="<%= settings['client_secret'] %>"
+    name="settings[client_secret]"
+  >
+</p>
+
+<% if [settings['client_id'], settings['client_secret']].all?(&:present?) %>
+  <% oauth_client = Hh::OAuth.client %>
+
+  <span><%= link_to t('redmine_hire.settings.auth'), oauth_client.auth_code.authorize_url(redirect_uri: Hh::OAuth.redirect_uri) %></span>
+<% end %>
 
 <h3><%= t('redmine_hire.settings.issue_settings') %></h3>
 <p>
@@ -69,3 +85,6 @@
   <p><%= link_to t('redmine_hire.settings.sidekiq.init'), '/redmine_hire/init_sidekiq_jobs' %></p>
   <p><%= link_to t('redmine_hire.settings.sidekiq.delete'), '/redmine_hire/destroy_sidekiq_jobs' %></p>
 <% end %>
+
+<%= hidden_field_tag 'settings[access_token]', @settings['access_token'] %>
+<%= hidden_field_tag 'settings[refresh_token]', @settings['refresh_token'] %>

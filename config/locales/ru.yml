@@ -8,6 +8,9 @@ ru:
       issue_status_name: Статус задач
       issue_tracker_name: Трекер
       issue_author_name: Автор задач
+      auth: Авторизовать приложение
+      auth_success: Авторизация прошла успешно
+      auth_fail: Ошибка авторизации
 
       sidekiq:
         title: Расписание Sidekiq-Cron

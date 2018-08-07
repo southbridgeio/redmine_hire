@@ -1,4 +1,5 @@
-gem 'byebug'
+gem 'oauth2'
+gem 'rest-client'
 
 group :test do
   gem "mocha"
