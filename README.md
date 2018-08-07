@@ -11,6 +11,8 @@ The plugin works only with Russian website hh.ru, and does not support other ser
 
 Помогите нам сделать этот плагин лучше, сообщая во вкладке [Issues](https://github.com/centosadmin/redmine_hire/issues) обо всех проблемах, с которыми вы столкнётесь при его использовании. Мы готовы ответить на все ваши вопросы, касающиеся этого плагина.
 
+**Важно! Для работы плагина необходим [платный доступ](https://github.com/hhru/api/blob/master/docs/employer_payable_methods.md) к методам API**
+
 ## Установка
 
 ### Требования
@@ -27,14 +29,19 @@ bundle exec rake redmine:plugins:migrate RAILS_ENV=production
 ```
 
 ## Настройка плагина
-Перед началом работы необходимо сконфигурировать настройки плагина ```/settings/plugin/redmine_hire```
 
-* HH Access Token, HH Employer ID - токен и id для доступа к HH API. Можно получить в личном [кабинете](https://dev.hh.ru/admin)
+1) Перед началом работы необходимо сконфигурировать настройки плагина ```/settings/plugin/redmine_hire```
+
+* HH Employer ID, Client ID, Client Secret - ID работодателя и данные для oauth-авторизации. Можно получить в личном [кабинете](https://dev.hh.ru/admin)
 * Project Name - имя проекта в котором будут создаваться задачи.
 * Issue Status Name - имя статуса для задач.
 * Issue Tracker Name - имя трекера для задач.
 * Issue Author Login - логин для автора задач (если не указан - автор будет Anonim).
 * Redmine API Key - ключ для Redmine API. Можно получить в настройках учетных записей Redmine.
+
+2) Нужно задать в личном кабинете HH Redirect URI в виде `https://your.host/redmine_hire/oauth`
+
+3) После сохранения корректных настроек на странице настроек плагина появится ссылка "Авторизовать приложение". Необходимо по ней перейти, чтобы получить access-token для дальнейшей работы.
 
 ## Запуск синхронизации с HH API и создание задач
 При синхронизации будут получены вакансии и созданы задачи из откликов соискателей.
