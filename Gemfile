@@ -5,5 +5,5 @@ group :test do
   gem "mocha"
   gem "webmock"
   gem 'shoulda'
-  gem 'minitest-reporters'
+  gem 'minitest-reporters', '<= 1.3.0'
 end
