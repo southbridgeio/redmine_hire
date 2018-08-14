@@ -1,3 +1,8 @@
+<% if api_data[:cover_letter].present? %>
+  *Сопроводительное письмо:*
+  <%= api_data[:cover_letter] %>
+<% end %>
+
 <% if previous_issues_ids.size > 0 %>
   *Предыдущие отклики:*
   <% previous_issues_ids.each do |issue_id| %>
@@ -23,10 +28,6 @@
 <%= api_data[:description] %>
 <% end %>
 
-<% if api_data[:cover_letter].present? %>
-*Сопроводительное письмо:*
-<%= api_data[:cover_letter] %>
-<% end %>
 
 *Предыдущие места работы:*
 <% api_data[:experience].each do |work| %>
