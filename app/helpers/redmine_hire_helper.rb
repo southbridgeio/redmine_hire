@@ -1,8 +1,8 @@
 module RedmineHireHelper
+  include ActionView::Helpers::DateHelper
 
-  def exp_in_monthes(start, finish)
-    finish = finish || Date.current
-    (finish.to_date - start.to_date).to_i/30
+  def experience_formatted(start_at, end_at)
+    end_at = end_at || Date.today
+    distance_of_time_in_words(start_at.to_date, end_at.to_date)
   end
-
 end

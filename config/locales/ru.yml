@@ -17,3 +17,43 @@ ru:
         schedule: Расписание Cron для синхронизации
         init: Инициализировать Cron
         delete: Удалить Cron
+
+  datetime:
+    distance_in_words:
+      about_x_hours:
+        one: около 1 часа
+        other: около %{count} часов
+      about_x_months:
+        one: около 1 месяца
+        other: около %{count} мес.
+      about_x_years:
+        one: около 1 года
+        other: около %{count} лет
+      almost_x_years:
+        one: почти 1 год
+        other: почти %{count} лет
+      half_a_minute: полминуты
+      less_than_x_minutes:
+        one: меньше минуты
+        other: меньше %{count} минут
+      less_than_x_seconds:
+        one: меньше 1 секунды
+        other: меньше %{count} секунд
+      over_x_years:
+        one: более 1 года
+        other: более %{count} лет
+      x_days:
+        one: 1 день
+        other: "%{count} дней"
+      x_minutes:
+        one: 1 минута
+        other: "%{count} минут"
+      x_months:
+        one: 1 месяц
+        other: "%{count} мес."
+      x_years:
+        one: 1 год
+        other: "%{count} лет"
+      x_seconds:
+        one: 1 секунда
+        other: "%{count} секунд"

@@ -65,6 +65,8 @@ module Hh
     end
 
     def build_comment
+      I18n.locale = Setting['default_language']
+
       previous_issues_ids = Issue.where(resume_id: api_data[:resume_id]).pluck(:id)
 
       controller = ActionController::Base.new
