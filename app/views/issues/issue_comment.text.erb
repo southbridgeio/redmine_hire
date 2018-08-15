@@ -31,7 +31,7 @@
 
 *Предыдущие места работы:*
 <% api_data[:experience].each do |work| %>
-  *Период:* <%= work['start'].to_date.strftime('%d.%m.%Y') %> - <%= work['end']&.to_date&.strftime('%d.%m.%Y') || 'наст. время' %> (<%= exp_in_monthes(work['start'], work['end']) %> мес.)
+  *Период:* <%= work['start'].to_date.strftime('%d.%m.%Y') %> - <%= work['end']&.to_date&.strftime('%d.%m.%Y') || 'наст. время' %> (<%= experience_formatted(work['start'], work['end']) %>)
   <% if work.dig('area', 'name').present? %>
     *Город:* <%= work['area']['name'] %>
   <% end %>
