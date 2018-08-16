@@ -1,13 +1,13 @@
 <% if api_data[:cover_letter].present? %>
-  *Сопроводительное письмо:*
-  <%= api_data[:cover_letter] %>
+*Сопроводительное письмо:*
+<%= api_data[:cover_letter] %>
 <% end %>
 
 <% if previous_issues_ids.size > 0 %>
-  *Предыдущие отклики:*
-  <% previous_issues_ids.each do |issue_id| %>
-    #<%= issue_id %>
-  <% end %>
+*Предыдущие отклики:*
+<% previous_issues_ids.each do |issue_id| %>
+#<%= issue_id %>
+<% end %>
 <% end %>
 
 *Вакансия:* <%= api_data[:vacancy_link] %> (<%= api_data[:vacancy_city] %>)
@@ -16,10 +16,10 @@
 *Дата рождения:* <%= api_data[:applicant_birth_date]&.to_date&.strftime('%d.%m.%Y') %>
 *Резюме:* <%= api_data[:resume_link] %>
 <% if api_data[:applicant_photo].present? %>
-  *Фото:* <%= api_data[:applicant_photo] %>
+*Фото:* <%= api_data[:applicant_photo] %>
 <% end %>
 <% if api_data[:salary].present? %>
-  *Зарплата:* <%= api_data[:salary] %>
+*Зарплата:* <%= api_data[:salary] %>
 <% end %>
 *E-mail:* <%= api_data[:applicant_email] %>
 
@@ -31,12 +31,11 @@
 
 *Предыдущие места работы:*
 <% api_data[:experience].each do |work| %>
-  *Период:* <%= work['start'].to_date.strftime('%d.%m.%Y') %> - <%= work['end']&.to_date&.strftime('%d.%m.%Y') || 'наст. время' %> (<%= experience_formatted(work['start'], work['end']) %>)
-  <% if work.dig('area', 'name').present? %>
-    *Город:* <%= work['area']['name'] %>
-  <% end %>
-  *Компания:* <%= work['company'] %>
-  *Опыт:*
-  <%= work['description'] %>
-
+*Период:* <%= work['start'].to_date.strftime('%d.%m.%Y') %> - <%= work['end']&.to_date&.strftime('%d.%m.%Y') || 'наст. время' %> (<%= experience_formatted(work['start'], work['end']) %>)
+<% if work.dig('area', 'name').present? %>
+*Город:* <%= work['area']['name'] %>
+<% end %>
+*Компания:* <%= work['company'] %>
+*Опыт:*
+<%= work['description'] %>
 <% end %>
