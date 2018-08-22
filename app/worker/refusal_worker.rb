@@ -1,17 +1,23 @@
 class RefusalWorker
   include Hh::Worker
 
+  def initialize(api = Hh::ApiService.new)
+    @api = api
+  end
+
   def perform(issue_id, refusal_url)
     issue = Issue.find(issue_id)
     hh_response = HhResponse.find_by(hh_id: issue.hh_response_id)
 
-    response = Hh::ApiService.new.api_post(refusal_url)
-    if response.code.start_with?('2')
-      issue.refusal!
-      issue.journals.create!(user_id: issue.author_id, notes: 'Отказ отправлен!')
-    else
-      hh_response.update!(refusal_url: nil)
-      issue.journals.create!(user_id: issue.author_id, notes: 'Отказ не отправлен, ссылка для отказа не активна')
-    end
+    refusal_template = api.api_get(refusal_url)
+    refusal_text = refusal_template.dig('mail', 'text')
+
+    api.api_put("#{Hh::ApiService::BASE_URL}/negotiations/discard_by_employer/#{hh_response.hh_id}", message: refusal_text)
+    issue.refusal!
+    issue.journals.create!(user_id: issue.author_id, notes: 'Отказ отправлен!')
   end
+
+  private
+
+  attr_reader :api
 end
