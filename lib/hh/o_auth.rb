@@ -47,6 +47,7 @@ module Hh
       settings = Setting.find_by(name: 'plugin_redmine_hire')
       settings.value = settings.value.merge(payload.slice('access_token', 'refresh_token'))
       settings.save
+      Setting.clear_cache
     end
   end
 end
