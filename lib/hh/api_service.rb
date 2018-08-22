@@ -93,6 +93,26 @@ module Hh
       raise
     end
 
+    def api_put(url, params = {})
+      tries ||= 3
+      header = {
+          content_type: "application/json",
+          authorization: "Bearer #{access_token}",
+          user_agent: USER_AGENT
+      }
+      RestClient.put(url, params, header) do |response, _, _|
+        result = JSON.parse(response.body)
+        raise RequestError.new(code: response.code, errors: result['errors']) if response.code != 200
+        result
+      end
+    rescue RequestError => e
+      if e.code == 403 && e.errors.any? { |error| error['type'] == 'oauth' && error['value'] == 'token_expired' } && !(tries -= 1).zero?
+        logger.info('Tokens expired. Trying to reissue...')
+        Hh::OAuth.reissue_tokens && retry
+      end
+      raise
+    end
+
     def api_post(url)
       uri = URI.parse(url)
       http = Net::HTTP.new(uri.host, uri.port)
