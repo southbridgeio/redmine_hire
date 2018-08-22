@@ -81,8 +81,8 @@ module Hh
         user_agent: USER_AGENT
       }
       RestClient.get(url, header) do |response, _, _|
-        result = JSON.parse(response.body)
-        raise RequestError.new(code: response.code, errors: result['errors']) if response.code != 200
+        result = JSON.parse(response.body) rescue {}
+        raise RequestError.new(code: response.code, errors: result['errors']) unless response.code.in?(200..299)
         result
       end
     rescue RequestError => e
@@ -101,8 +101,8 @@ module Hh
           user_agent: USER_AGENT
       }
       RestClient.put(url, params, header) do |response, _, _|
-        result = JSON.parse(response.body)
-        raise RequestError.new(code: response.code, errors: result['errors']) if response.code != 200
+        result = JSON.parse(response.body) rescue {}
+        raise RequestError.new(code: response.code, errors: result['errors']) unless response.code.in?(200..299)
         result
       end
     rescue RequestError => e
