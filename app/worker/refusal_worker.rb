@@ -15,13 +15,13 @@ class RefusalWorker
     api.api_put("#{Hh::ApiService::BASE_URL}/negotiations/discard_by_employer/#{hh_response.hh_id}", message: refusal_text)
     write_journal(issue) do |issue|
       issue.refusal!
-      issue.journals.create!(user_id: issue.author_id, notes: 'Отказ отправлен!')
+      issue.journals.create!(user_id: issue.author_id, notes: 'Отказ отправлен.')
     end
   rescue Hh::ApiService::RequestError => e
     logger.error e.to_s
     logger.error e.backtrace.join("\n")
     write_journal(issue) do |issue|
-      issue.journals.create!(user_id: issue.author_id, notes: 'Отказ не отправлен, произошла ошибка')
+      issue.journals.create!(user_id: issue.author_id, notes: 'Отказ не отправлен, произошла ошибка.')
     end
   end
 
