@@ -13,12 +13,16 @@ class RefusalWorker
     refusal_text = refusal_template.dig('mail', 'text')
 
     api.api_put("#{Hh::ApiService::BASE_URL}/negotiations/discard_by_employer/#{hh_response.hh_id}", message: refusal_text)
-    issue.refusal!
-    issue.journals.create!(user_id: issue.author_id, notes: 'Отказ отправлен!')
+    write_journal(issue) do |issue|
+      issue.refusal!
+      issue.journals.create!(user_id: issue.author_id, notes: 'Отказ отправлен!')
+    end
   rescue Hh::ApiService::RequestError => e
     logger.error e.to_s
     logger.error e.backtrace.join("\n")
-    issue.journals.create!(user_id: issue.author_id, notes: 'Отказ не отправлен, произошла ошибка')
+    write_journal(issue) do |issue|
+      issue.journals.create!(user_id: issue.author_id, notes: 'Отказ не отправлен, произошла ошибка')
+    end
   end
 
   private
@@ -28,5 +32,20 @@ class RefusalWorker
   def logger
     out = Rails.env.production? ? Rails.root.join('log', 'redmine_hire.log') : STDOUT
     @logger ||= Logger.new(out)
+  end
+
+  def write_journal(issue, &_)
+    tries = 3
+    begin
+      Issue.transaction do
+        yield(issue)
+      end
+    rescue ActiveRecord::StaleObjectError
+      unless (tries -= 1).zero?
+        issue.reload
+        retry
+      end
+      raise
+    end
   end
 end
