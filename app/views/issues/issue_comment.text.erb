@@ -15,9 +15,6 @@
 *Город:* <%= api_data[:applicant_city] %>
 *Дата рождения:* <%= api_data[:applicant_birth_date]&.to_date&.strftime('%d.%m.%Y') %>
 *Резюме:* <%= api_data[:resume_link] %>
-<% if api_data[:applicant_photo].present? %>
-*Фото:* <%= api_data[:applicant_photo] %>
-<% end %>
 <% if api_data[:salary].present? %>
 *Зарплата:* <%= api_data[:salary] %>
 <% end %>
