@@ -24,22 +24,20 @@ module Hh
       vacancies.each do |vacancy|
         begin
           ActiveRecord::Base.transaction do
-            vacancy_save(vacancy)
+            saved_vacancy = vacancy_save(vacancy)
 
             vacancy_responses = get_vacancy_responses(vacancy['id'])
 
             vacancy_responses.each do |hh_response|
               next if hh_response_present?(hh_response['id'].to_i)
-              hh_response_save(hh_response)
-
               raise "Resume empty" if hh_response['resume'].blank?
 
               resume = api_get(hh_response['resume']['url'])
-              applicant_save(resume)
-
               cover_letter = get_cover_letter(hh_response['messages_url'])
 
-              IssueBuilder.new(api_data(vacancy, resume, cover_letter, hh_response['id'])).execute
+              saved_response = hh_response_save(hh_response, resume, cover_letter, saved_vacancy)
+
+              IssueBuilder.new(saved_response).execute
             end
           end
         rescue RequestError => e
@@ -53,7 +51,7 @@ module Hh
     end
 
     def rollback! # for debug process
-      Project.find_by(name: Hh::IssueBuilder::PROJECT_NAME).issues.where.not(resume_id: nil).destroy_all
+      Project.find_by(name: Hh::IssueBuilder.new({}).project_name).issues.where.not(resume_id: nil).destroy_all
       HhResponse.destroy_all
       HhApplicant.destroy_all
       HhVacancy.destroy_all
@@ -137,16 +135,21 @@ module Hh
     end
 
     def vacancy_save(vacancy)
-      vacancy = HhVacancy.find_or_create_by!(hh_id: vacancy['id'])
-      vacancy.update!(info: vacancy, info_updated_at: DateTime.current)
+      vacancy_record = HhVacancy.find_or_create_by!(hh_id: vacancy['id'])
+      vacancy_record.update!(name: vacancy['name'], city: vacancy['area']['name'], link: vacancy['alternate_url'])
+      vacancy_record
     end
 
-    def hh_response_save(hh_response)
+    def hh_response_save(hh_response, resume, cover_letter, vacancy)
       refusal_url = hh_response['actions']
         &.find { |e| e['name'] == 'Отказ' }&.[]('templates')
         &.find { |e| e['name'] == "Шаблон быстрого отказа на отклик" }&.[]('url') || nil
 
-      HhResponse.create!(hh_id: hh_response['id'], refusal_url: refusal_url)
+      HhResponse.create!(hh_id: hh_response['id'],
+                         refusal_url: refusal_url,
+                         resume: resume,
+                         cover_letter: cover_letter,
+                         hh_vacancy_id: vacancy.id)
     end
 
     def applicant_save(resume)
@@ -178,7 +181,7 @@ module Hh
     end
 
     def hh_response_present?(id)
-      HhResponse.find_by(hh_id: id).present?
+      HhResponse.exists?(hh_id: id)
     end
 
     def api_data(vacancy, resume, cover_letter, hh_response_id)
