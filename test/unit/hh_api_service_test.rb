@@ -36,11 +36,6 @@ class HhApiServiceTest < ActiveSupport::TestCase
       assert_equal 1, HhVacancy.count
     end
 
-    should 'save hh_applicant data' do
-      subject
-      assert_equal 1, HhApplicant.count
-    end
-
     should 'save new hh_response' do
       subject
       assert_equal 1, HhResponse.count
@@ -50,59 +45,6 @@ class HhApiServiceTest < ActiveSupport::TestCase
       HhResponse.create(hh_id: '973246529')
       subject
       assert_equal 1, HhResponse.count
-    end
-
-  end
-
-  context '.send_refusal' do
-
-    setup do
-      @hh_response = HhResponse.create(hh_id: 222, refusal_url: 'https://api.hh.ru/send_refusal')
-      @issue = issues(:issue_1)
-      Hh::ApiService.any_instance.stubs(:sidekiq_present?).returns(false)
-    end
-
-    subject { Hh::ApiService.new.send_refusal(111) }
-
-    context 'if api response success' do
-
-      setup do
-        stub_request(:post, 'https://api.hh.ru/send_refusal')
-          .to_return body: '', status: '204'
-      end
-
-      should 'set issue status to refusal' do
-        subject
-        assert_equal 'refusal', @issue.reload.hiring_status
-      end
-
-      should 'create issue journal' do
-        subject
-        assert_equal 1, @issue.reload.journals.count
-      end
-    end
-
-    context 'if api response fail' do
-
-      setup do
-        stub_request(:post, 'https://api.hh.ru/send_refusal')
-          .to_return body: '', status: '404'
-      end
-
-      should 'delete refusal_url from hh_response' do
-        subject
-        assert_equal nil, @hh_response.reload.refusal_url
-      end
-
-      should 'issue status' do
-        subject
-        assert_equal 'not_status', @issue.reload.hiring_status
-      end
-
-      should 'create issue journal' do
-        subject
-        assert_equal 1, @issue.reload.journals.count
-      end
     end
 
   end

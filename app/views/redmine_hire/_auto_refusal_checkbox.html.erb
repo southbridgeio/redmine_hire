@@ -1,10 +1,14 @@
-<% refusal_url = HhResponse.find_by(hh_id: @issue.hh_response_id)&.refusal_url %>
+<% if @project.name == Setting.plugin_redmine_hire['project_name'] %>
 
-<% if @issue.refusal? %>
-  <p>Отказ отправлен</p>
-<% elsif refusal_url.present? %>
-  <%= check_box_tag 'issue[auto_refusal]', 0 %>
-  <%= label_tag :issue_auto_refusal, 'Отправить отказ' %>
-<% else %>
-  <p>Нет ссылки для отказа</p>
+  <% refusal_url = HhResponse.find_by(hh_id: @issue.hh_response_id)&.refusal_url %>
+
+  <% if @issue.refusal? %>
+    <p>Отказ отправлен</p>
+  <% elsif refusal_url.present? %>
+    <%= check_box_tag 'issue[auto_refusal]', 0 %>
+    <%= label_tag :issue_auto_refusal, 'Отправить отказ' %>
+  <% else %>
+    <p>Нет ссылки для отказа</p>
+  <% end %>
+
 <% end %>

@@ -1,5 +1,5 @@
 class HhVacancy < ActiveRecord::Base
-  unloadable
-
   serialize :info
+
+  has_many :hh_responses
 end

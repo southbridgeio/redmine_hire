@@ -1,0 +1,55 @@
+<% if @issue.hh_response %>
+  <% Hh::IssueDecorator.new(@issue).tap do |issue| %>
+    <% if issue.cover_letter.present? %>
+      <p>
+        <strong>Сопроводительное письмо:</strong>
+        <br>
+        <%= issue.cover_letter.gsub("\n", '<br>').html_safe %>
+      </p>
+    <% end %>
+
+    <p>
+      <strong>Вакансия:</strong> <%= link_to issue.vacancy_link, issue.vacancy_link %> (<%= issue.vacancy_city %>)
+      <br>
+      <strong>Имя:</strong> <%= issue.applicant_first_name %> <%= issue.applicant_last_name %>
+      <br>
+      <strong>Город:</strong> <%= issue.applicant_city %>
+      <br>
+      <strong>Дата рождения:</strong> <%= issue.applicant_birth_date&.to_date&.strftime('%d.%m.%Y') %>
+      <br>
+      <strong>Резюме:</strong> <%= link_to issue.resume_link, issue.resume_link %>
+      <% if issue.salary.present? %>
+        <br>
+        <strong>Зарплата:</strong> <%= issue.salary %>
+      <% end %>
+      <br>
+      <strong>E-mail:</strong> <%= issue.applicant_email %>
+    </p>
+
+    <p>
+      <% if issue.skills.present? %>
+        <strong>О себе:</strong>
+        <%= issue.skills.gsub("\n", '<br>').html_safe %>
+      <% end %>
+    </p>
+
+    <p>
+      <strong>Предыдущие места работы:</strong>
+      <% issue.experience.each do |work| %>
+      <p>
+        <strong>Период:</strong> <%= work['start'].to_date.strftime('%d.%m.%Y') %> - <%= work['end']&.to_date&.strftime('%d.%m.%Y') || 'наст. время' %> (<%= issue.experience_formatted(work['start'], work['end']) %>)
+        <br>
+        <% if work.dig('area', 'name').present? %>
+          <strong>Город:</strong> <%= work['area']['name'] %>
+          <br>
+        <% end %>
+        <strong>Компания:</strong> <%= work['company'] %>
+        <br>
+        <strong>Опыт:</strong>
+        <br>
+        <%= work['description'].gsub("\n", '<br>').html_safe %>
+      </p>
+    <% end %>
+    </p>
+  <% end %>
+<% end %>

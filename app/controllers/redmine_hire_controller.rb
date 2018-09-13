@@ -1,5 +1,5 @@
 class RedmineHireController < ApplicationController
-  unloadable
+
 
   def refusal_response
     @issue = Issue.find(params[:id])
