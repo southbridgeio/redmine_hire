@@ -27,16 +27,16 @@ module Hh
         hh_response.update!(issue_id: issue.id)
 
         if helpdesk_present?
-          contact = Contact.find_or_initialize_by(email: api_data[:applicant_email])
+          contact = Contact.find_or_initialize_by(email: hh_response.applicant_email)
           contact.assign_attributes(
             project: issue.project,
-            first_name: api_data[:applicant_first_name],
-            last_name: api_data[:applicant_last_name]
+            first_name: hh_response.applicant_first_name,
+            last_name: hh_response.applicant_last_name
           )
           contact.save!
 
           HelpdeskTicket.create!(
-            from_address: api_data[:applicant_email],
+            from_address: hh_response.applicant_email,
             issue: issue,
             customer: contact
           )

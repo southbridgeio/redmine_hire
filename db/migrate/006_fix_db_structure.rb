@@ -1,4 +1,6 @@
 class FixDbStructure < ActiveRecord::Migration
+  class HhResponse < ActiveRecord::Base; end
+
   def up
     add_column :hh_responses, :resume, :text
     add_column :hh_responses, :cover_letter, :text
@@ -16,6 +18,7 @@ class FixDbStructure < ActiveRecord::Migration
       vacancy = HhVacancy.find_by(hh_id: issue.vacancy_id)
       applicant = HhApplicant.find_by(hh_id: issue.resume_id)
       response.update_columns(issue_id: issue.id, hh_vacancy_id: vacancy.id, resume: applicant.attributes_before_type_cast['resume'])
+      issue.update!(description: '')
     end
   end
 

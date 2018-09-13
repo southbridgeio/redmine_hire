@@ -152,11 +152,6 @@ module Hh
                          hh_vacancy_id: vacancy.id)
     end
 
-    def applicant_save(resume)
-      hh_applicant = HhApplicant.find_or_create_by!(hh_id: resume['id'])
-      hh_applicant.update!(resume: resume, resume_updated_at: DateTime.current)
-    end
-
     # GET /employers/{employer_id}/vacancies/active // получаем все активные вакансии
     def get_active_vacancies
       api_response = api_get("#{BASE_URL}/employers/#{employer_id}/vacancies/active")
@@ -182,29 +177,6 @@ module Hh
 
     def hh_response_present?(id)
       HhResponse.exists?(hh_id: id)
-    end
-
-    def api_data(vacancy, resume, cover_letter, hh_response_id)
-      {
-        vacancy_id: vacancy['id'],
-        resume_id: resume['id'],
-        hh_response_id: hh_response_id,
-        vacancy_name: vacancy['name'],
-        applicant_city: resume['area']['name'],
-        vacancy_city: vacancy['area']['name'],
-        vacancy_link: vacancy['alternate_url'],
-        applicant_email: resume['contact'].select { |c| c['type']['id'] == 'email' }.first['value'],
-        applicant_first_name: resume['first_name'],
-        applicant_last_name: resume['last_name'],
-        applicant_middle_name: resume['middle_name'],
-        applicant_birth_date: resume['birth_date'],
-        resume_link: resume['alternate_url'],
-        applicant_photo: (resume['photo']['medium'] if resume['photo'].present?),
-        salary: (resume['salary']['amount'] if resume['salary'].present?),
-        experience: resume['experience'],
-        description: resume['skills'],
-        cover_letter: cover_letter
-      }
     end
 
     def sidekiq_present?
