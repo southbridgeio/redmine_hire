@@ -36,11 +36,6 @@ class HhApiServiceTest < ActiveSupport::TestCase
       assert_equal 1, HhVacancy.count
     end
 
-    should 'save hh_applicant data' do
-      subject
-      assert_equal 1, HhApplicant.count
-    end
-
     should 'save new hh_response' do
       subject
       assert_equal 1, HhResponse.count
