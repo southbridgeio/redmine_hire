@@ -63,7 +63,7 @@ module Hh
     end
 
     def build_subject
-      "#{hh_response.vacancy_name} #{hh_response.vacancy_city ? "(#{hh_response.vacancy_city})" : nil}"
+      "#{hh_response.vacancy_name} #{hh_response.applicant_city ? "(#{hh_response.applicant_city})" : nil}"
     end
 
     def helpdesk_present?
