@@ -1,4 +1,4 @@
-class AddKeysToIssues < ActiveRecord::Migration
+class AddKeysToIssues < Rails.version < '5.0' ? ActiveRecord::Migration : ActiveRecord::Migration[4.2]
   def up
     add_column :issues, :vacancy_id, :bigint
     add_column :issues, :resume_id, :string

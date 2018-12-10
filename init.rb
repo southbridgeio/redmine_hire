@@ -1,4 +1,8 @@
-ActionDispatch::Callbacks.to_prepare do
+
+# Rails 5/Rails 4
+reloader = defined?(ActiveSupport::Reloader) ? ActiveSupport::Reloader : ActionDispatch::Reloader
+
+reloader.to_prepare do
   paths = ['/lib/**/*.rb', '/app/worker/*.rb']
   paths.each do |path|
     Dir.glob(File.dirname(__FILE__) + path).each do |file|

@@ -1,3 +1,5 @@
+require 'sidekiq' if Gem.loaded_specs.key?('sidekiq')
+
 module Hh
   module Worker
     def self.included(klass)
