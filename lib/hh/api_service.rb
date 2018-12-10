@@ -30,9 +30,8 @@ module Hh
 
             vacancy_responses.each do |hh_response|
               next if hh_response_present?(hh_response['id'].to_i)
-              raise "Resume empty" if hh_response['resume'].blank?
 
-              resume = api_get(hh_response['resume']['url'])
+              resume = hh_response['resume'].present? ? api_get(hh_response['resume']['url']) : {}
               cover_letter = get_cover_letter(hh_response['messages_url'])
 
               saved_response = hh_response_save(hh_response, resume, cover_letter, saved_vacancy)

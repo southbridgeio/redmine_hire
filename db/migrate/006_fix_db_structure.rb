@@ -1,4 +1,4 @@
-class FixDbStructure < ActiveRecord::Migration
+class FixDbStructure < Rails.version < '5.0' ? ActiveRecord::Migration : ActiveRecord::Migration[4.2]
   class HhResponse < ActiveRecord::Base; end
 
   def up
