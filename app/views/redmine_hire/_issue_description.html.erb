@@ -11,7 +11,7 @@
     <p>
       <strong>Вакансия:</strong> <%= link_to issue.vacancy_link, issue.vacancy_link %> (<%= issue.vacancy_city %>)
       <br>
-      <strong>Имя:</strong> <%= issue.applicant_first_name %> <%= issue.applicant_last_name %>
+      <strong>Имя:</strong> <%= issue.applicant_first_name || 'Скрыто соискателем' %> <%= issue.applicant_last_name %>
       <br>
       <strong>Город:</strong> <%= issue.applicant_city %>
       <br>

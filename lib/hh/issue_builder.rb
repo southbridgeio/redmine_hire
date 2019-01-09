@@ -26,12 +26,18 @@ module Hh
 
         hh_response.update!(issue_id: issue.id)
 
-        if helpdesk_present?
+        if helpdesk_present? && hh_response.applicant_email.present?
           contact = Contact.find_or_initialize_by(email: hh_response.applicant_email)
+          first_name, last_name =
+              if contact.new_record?
+                [hh_response.applicant_first_name || 'Имя скрыто соискателем', hh_response.applicant_last_name]
+              else
+                [hh_response.applicant_first_name || contact.first_name, hh_response.applicant_last_name || contact.last_name]
+              end
           contact.assign_attributes(
             project: issue.project,
-            first_name: hh_response.applicant_first_name,
-            last_name: hh_response.applicant_last_name
+            first_name: first_name,
+            last_name: last_name
           )
           contact.save!
 
