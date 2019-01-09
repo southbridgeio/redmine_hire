@@ -32,6 +32,8 @@ module Hh
               next if hh_response_present?(hh_response['id'].to_i)
 
               resume = hh_response['resume'].present? ? api_get(hh_response['resume']['url']) : {}
+              next if resume.blank?
+
               cover_letter = get_cover_letter(hh_response['messages_url'])
 
               saved_response = hh_response_save(hh_response, resume, cover_letter, saved_vacancy)

@@ -70,6 +70,5 @@ module Hh
       helpdesk = Redmine::Plugin.find(:redmine_contacts_helpdesk) rescue nil
       helpdesk.present?
     end
-
   end
 end
