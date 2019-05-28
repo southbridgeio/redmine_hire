@@ -126,11 +126,11 @@ module Hh
     private
 
     def access_token
-      Setting.plugin_redmine_hire['access_token']
+      (Setting.find_by(name: :plugin_redmine_hire)&.value || {})['access_token']
     end
 
     def employer_id
-      Setting.plugin_redmine_hire['hh_employer_id']
+      (Setting.find_by(name: :plugin_redmine_hire)&.value || {})['hh_employer_id']
     end
 
     def vacancy_save(vacancy)
