@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/centosadmin/redmine_hire.svg?branch=master)](https://travis-ci.org/centosadmin/redmine_hire)
+[![Build Status](https://travis-ci.org/southbridgeio/redmine_hire.svg?branch=master)](https://travis-ci.org/southbridgeio/redmine_hire)
 
 # redmine_hire
 
@@ -9,7 +9,7 @@ The plugin works only with Russian website hh.ru, and does not support other ser
 Плагин синхронизирует отклики по вашим вакансиям и создает на основе их задачи в Redmine.
 Для каждого отклика + соискателя создается отдельная задача c данными о вакансии и соискателе.
 
-Помогите нам сделать этот плагин лучше, сообщая во вкладке [Issues](https://github.com/centosadmin/redmine_hire/issues) обо всех проблемах, с которыми вы столкнётесь при его использовании. Мы готовы ответить на все ваши вопросы, касающиеся этого плагина.
+Помогите нам сделать этот плагин лучше, сообщая во вкладке [Issues](https://github.com/southbridgeio/redmine_hire/issues) обо всех проблемах, с которыми вы столкнётесь при его использовании. Мы готовы ответить на все ваши вопросы, касающиеся этого плагина.
 
 **Важно! Для работы плагина необходим [платный доступ](https://github.com/hhru/api/blob/master/docs/employer_payable_methods.md) к методам API**
 
@@ -23,7 +23,7 @@ The plugin works only with Russian website hh.ru, and does not support other ser
 
 ```
 cd {REDMINE_ROOT}
-git clone https://github.com/centosadmin/redmine_hire.git plugins/redmine_hire
+git clone https://github.com/southbridgeio/redmine_hire.git plugins/redmine_hire
 bundle install
 bundle exec rake redmine:plugins:migrate RAILS_ENV=production
 ```
