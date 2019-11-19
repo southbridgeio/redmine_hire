@@ -12,8 +12,8 @@ Redmine::Plugin.register :redmine_hire do
   author 'Southbridge'
   description 'Plugin to work with the hh.ru api service'
   version '0.0.1'
-  url 'https://github.com/centosadmin/redmine_hire'
-  author_url 'https://github.com/centosadmin'
+  url 'https://github.com/southbridgeio/redmine_hire'
+  author_url 'https://github.com/southbridgeio'
 
   settings :default => {
     'client_id' => '',
